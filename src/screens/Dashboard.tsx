@@ -150,7 +150,7 @@ export function DashboardScreen() {
       title="Dashboard"
       subtitle="Resumen del inventario y las asignaciones registradas."
     >
-      <div className="flex flex-wrap items-center justify-center gap-16">
+      <div className="flex w-full flex-wrap items-center justify-evenly gap-4">
         <InfoCard
           icon={<Monitor aria-hidden="true" strokeWidth={1.5} className="size-8" />}
           quantity={data.equipment.length}
