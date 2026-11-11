@@ -1,0 +1,25 @@
+@reference "../../tokens/tokens.css";
+
+.eq-modal-operator {
+  @apply flex w-full max-w-[566px] flex-col items-start justify-between gap-2.5 rounded-[24px] border-2 border-stroke bg-object p-5 text-primary;
+}
+
+.eq-modal-operator__header {
+  @apply flex items-center gap-3.5;
+}
+
+.eq-modal-operator__avatar {
+  @apply flex size-16 shrink-0 items-center justify-center rounded-full bg-avatar-solid text-2xl font-semibold text-avatar-icon;
+}
+
+.eq-modal-operator__body {
+  @apply flex w-full flex-col items-end gap-3.5 md:flex-row;
+}
+
+.eq-modal-operator__fields {
+  @apply flex w-full flex-col gap-2.5 md:flex-1;
+}
+
+.eq-modal-operator__actions {
+  @apply flex items-center gap-3.5;
+}

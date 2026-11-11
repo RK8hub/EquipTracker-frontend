@@ -1,0 +1,29 @@
+@reference "../../tokens/tokens.css";
+
+.eq-textfield {
+  @apply flex flex-col p-px;
+}
+
+.eq-textfield > label {
+  @apply text-base font-normal text-primary;
+}
+
+.eq-textfield__input {
+  @apply flex items-center gap-2.5 rounded-[8px] border border-stroke p-2 transition-colors;
+}
+
+.eq-textfield__input:focus-within {
+  @apply ring-[1px] ring-zinc-400/40;
+}
+
+.eq-textfield__icon {
+  @apply inline-flex size-6 shrink-0 items-center justify-center;
+}
+
+.eq-textfield__control {
+  @apply w-full bg-transparent text-base font-normal text-primary outline-none;
+}
+
+.eq-textfield__control::placeholder {
+  @apply text-primary/45;
+}

@@ -1,0 +1,33 @@
+@reference "../../tokens/tokens.css";
+
+.eq-popup {
+  @apply flex min-h-[350px] w-full max-w-[251px] flex-col items-center justify-between gap-2.5 rounded-[24px] border-2 border-stroke bg-object px-5 py-10 text-primary;
+}
+
+.eq-popup__avatar {
+  @apply flex size-16 shrink-0 items-center justify-center rounded-full bg-destructive text-avatar-icon;
+}
+
+.eq-popup__avatar svg {
+  @apply size-8;
+}
+
+.eq-popup__text {
+  @apply flex flex-col items-center gap-2 text-center;
+}
+
+.eq-popup__title {
+  @apply text-2xl font-semibold;
+}
+
+.eq-popup__description {
+  @apply text-base font-normal tracking-[0.05em];
+}
+
+.eq-popup__actions {
+  @apply flex w-full items-center justify-center gap-5;
+}
+
+.eq-popup__actions > button {
+  @apply flex-1;
+}

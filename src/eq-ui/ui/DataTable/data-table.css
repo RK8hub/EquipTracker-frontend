@@ -1,0 +1,45 @@
+@reference "../../tokens/tokens.css";
+
+.eq-data-table {
+  @apply flex w-full flex-col gap-5;
+}
+
+.eq-data-table__scroll {
+  @apply w-full overflow-x-auto;
+}
+
+.eq-data-table__table {
+  @apply w-full min-w-[900px] overflow-hidden rounded-[14px] border border-stroke bg-object text-primary;
+}
+
+.eq-data-table__row {
+  @apply flex min-h-[50px] items-stretch border-b border-stroke/60;
+}
+
+.eq-data-table__row:last-child {
+  @apply border-b-0;
+}
+
+.eq-data-table__row[data-selected] {
+  @apply bg-primary/5;
+}
+
+.eq-data-table__head {
+  @apply border-b border-stroke font-semibold;
+}
+
+.eq-data-table__check {
+  @apply flex w-[33px] shrink-0 items-center justify-center;
+}
+
+.eq-data-table__cell {
+  @apply flex flex-1 items-center px-2 py-3 text-sm font-normal;
+}
+
+.eq-data-table__head .eq-data-table__cell {
+  @apply font-semibold;
+}
+
+.eq-data-table__empty {
+  @apply p-10 text-center text-sm text-muted-foreground;
+}

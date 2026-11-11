@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+/*
+ * Tokens de la colección "Equiptracker" (Claro / Oscuro).
+ * Los dos tokens que chocaban como "primary" quedan separados:
+ *   primary -> texto principal del diseño
+ *   strong  -> segundo valor que el archivo definía también como primary
+ *
+ * Tema claro: fondo gris azulado con tarjetas blancas "flotando" para
+ * replicar la profundidad del tema oscuro. Neutros con tinte frío (~215°).
+ */
+:root {
+  --eq-background: #eceef2;
+  --eq-foreground: #0b0f14;
+  --eq-card: #ffffff;
+  --eq-card-inverse: #171c24;
+  --eq-card-inverse-foreground: #f6f7f9;
+  --eq-object: #e1e5eb;
+  --eq-primary: #2f3744;
+  --eq-primary-foreground: #f6f7f9;
+  --eq-strong: #171c24;
+  --eq-stroke: #2f3744;
+  --eq-border: #d2d8e0;
+  --eq-muted-foreground: #5b6574;
+  --eq-accent: #0a5fb4;
+  --eq-brand: #0872d8;
+  --eq-brand-foreground: #ffffff;
+  --eq-success: #15803d;
+  --eq-success-foreground: #ffffff;
+  --eq-warning: #b45309;
+  --eq-warning-foreground: #ffffff;
+  --eq-destructive: #d92d20;
+  --eq-destructive-foreground: #ffffff;
+  --eq-avatar: #dfe4ea;
+  --eq-avatar-foreground: #5b6574;
+  --eq-avatar-solid: #171c24;
+  --eq-avatar-icon: #e1e5eb;
+  --eq-page: #dde1e7;
+}
+
+.dark {
+  --eq-background: #1E1E1E;
+  --eq-foreground: #fafafa;
+  --eq-card: #171717;
+  --eq-card-inverse: #e5e5e5;
+  --eq-card-inverse-foreground: #0a0a0a;
+  --eq-object: #0a0a0a;
+  --eq-primary: #e8e8e8;
+  --eq-primary-foreground: #171717;
+  --eq-strong: #e5e5e5;
+  --eq-stroke: #404040;
+  --eq-border: #262626;
+  --eq-muted-foreground: #a3a3a3;
+  --eq-accent: #3b9eff;
+  --eq-brand: #0588f0;
+  --eq-brand-foreground: #ffffff;
+  --eq-success: #30d158;
+  --eq-success-foreground: #0a0a0a;
+  --eq-warning: #fbbf24;
+  --eq-warning-foreground: #0a0a0a;
+  --eq-destructive: #f87171;
+  --eq-destructive-foreground: #0a0a0a;
+  --eq-avatar: #262626;
+  --eq-avatar-foreground: #d4d4d4;
+  --eq-avatar-solid: #171717;
+  --eq-avatar-icon: #e8e8e8;
+  --eq-page: #171717;
+}
+
+@theme inline {
+  --color-background: var(--eq-background);
+  --color-foreground: var(--eq-foreground);
+  --color-card: var(--eq-card);
+  --color-card-inverse: var(--eq-card-inverse);
+  --color-card-inverse-foreground: var(--eq-card-inverse-foreground);
+  --color-object: var(--eq-object);
+  --color-primary: var(--eq-primary);
+  --color-primary-foreground: var(--eq-primary-foreground);
+  --color-strong: var(--eq-strong);
+  --color-stroke: var(--eq-stroke);
+  --color-border: var(--eq-border);
+  --color-muted-foreground: var(--eq-muted-foreground);
+  --color-accent: var(--eq-accent);
+  --color-brand: var(--eq-brand);
+  --color-brand-foreground: var(--eq-brand-foreground);
+  --color-success: var(--eq-success);
+  --color-success-foreground: var(--eq-success-foreground);
+  --color-warning: var(--eq-warning);
+  --color-warning-foreground: var(--eq-warning-foreground);
+  --color-destructive: var(--eq-destructive);
+  --color-destructive-foreground: var(--eq-destructive-foreground);
+  --color-avatar: var(--eq-avatar);
+  --color-avatar-foreground: var(--eq-avatar-foreground);
+  --color-avatar-solid: var(--eq-avatar-solid);
+  --color-avatar-icon: var(--eq-avatar-icon);
+  --color-page: var(--eq-page);
+
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    sans-serif;
+}
+
+/* Radios que usa el archivo */
+@theme {
+  --radius-field: 14px;
+  --radius-card: 24px;
+  --radius-input: 8px;
+}

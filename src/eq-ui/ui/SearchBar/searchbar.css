@@ -1,0 +1,21 @@
+@reference "../../tokens/tokens.css";
+
+.eq-searchbar {
+  @apply flex h-10 w-full max-w-[350px] items-center gap-2.5 rounded-[14px] border border-stroke bg-object px-2.5 py-2.5 text-primary;
+}
+
+.eq-searchbar__icon {
+  @apply size-6 shrink-0;
+}
+
+.eq-searchbar__control {
+  @apply w-full bg-transparent text-base font-normal text-primary outline-none;
+}
+
+.eq-searchbar__control::placeholder {
+  @apply text-primary/60;
+}
+
+.eq-searchbar__control::-webkit-search-cancel-button {
+  @apply appearance-none;
+}

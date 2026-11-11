@@ -1,0 +1,21 @@
+@reference "../../tokens/tokens.css";
+
+.eq-conect-box {
+  @apply flex min-h-[450px] w-full max-w-[452px] flex-col items-center justify-around gap-[42px] rounded-[24px] border border-stroke bg-object px-5 py-10 text-primary;
+}
+
+.eq-conect-box__text {
+  @apply flex flex-col items-center gap-2 text-center;
+}
+
+.eq-conect-box__text h2 {
+  @apply text-[32px] font-semibold;
+}
+
+.eq-conect-box__text p {
+  @apply max-w-[316px] text-base font-normal;
+}
+
+.eq-conect-box__actions {
+  @apply flex w-full flex-col items-center gap-3.5;
+}

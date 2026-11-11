@@ -1,0 +1,5 @@
+@reference "../../tokens/tokens.css";
+
+.eq-tag {
+  @apply inline-flex h-[42px] min-w-9 items-center justify-between gap-2.5 rounded-[14px] border border-stroke px-2.5 py-2.5 text-xs font-normal text-primary;
+}

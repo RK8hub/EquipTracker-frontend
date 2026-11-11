@@ -1,0 +1,77 @@
+@reference "../../tokens/tokens.css";
+
+.eq-sidebar {
+  @apply flex h-full w-full max-w-[255px] flex-col gap-2 rounded-none border-0 border-r border-stroke bg-card p-2 text-foreground;
+}
+
+.eq-sidebar button {
+  @apply cursor-pointer outline-none;
+}
+
+.eq-sidebar button:focus-visible {
+  @apply ring-[3px] ring-zinc-400/50;
+}
+
+.eq-sidebar__workspace {
+  @apply flex w-full items-center gap-2 rounded-[10px] p-2 text-left transition-colors;
+}
+
+.eq-sidebar__workspace:hover {
+  @apply bg-border/50;
+}
+
+.eq-sidebar__workspace-icon {
+  @apply flex size-8 shrink-0 items-center justify-center rounded-[10px] bg-brand text-xs font-semibold text-brand-foreground;
+}
+
+.eq-sidebar__workspace-text {
+  @apply flex min-w-0 flex-1 flex-col;
+}
+
+.eq-sidebar__workspace-name {
+  @apply truncate text-sm font-semibold leading-5;
+}
+
+.eq-sidebar__workspace-company {
+  @apply truncate text-xs font-normal leading-4;
+}
+
+.eq-sidebar__chevrons {
+  @apply size-4 shrink-0;
+}
+
+.eq-sidebar__tabs {
+  @apply flex flex-1 flex-col gap-2 p-2;
+}
+
+.eq-sidebar__section {
+  @apply px-2 text-xs font-semibold text-muted-foreground;
+}
+
+.eq-sidebar__nav {
+  @apply flex flex-col gap-2;
+}
+
+.eq-sidebar__user {
+  @apply flex w-full items-center gap-2 rounded-[10px] p-2 text-left transition-colors;
+}
+
+.eq-sidebar__user:hover {
+  @apply bg-border/50;
+}
+
+.eq-sidebar__avatar {
+  @apply flex size-8 shrink-0 items-center justify-center rounded-full bg-avatar text-xs font-semibold text-avatar-foreground;
+}
+
+.eq-sidebar__user-text {
+  @apply flex min-w-0 flex-1 flex-col;
+}
+
+.eq-sidebar__user-name {
+  @apply truncate text-sm font-semibold leading-5;
+}
+
+.eq-sidebar__user-email {
+  @apply truncate text-xs font-normal leading-4;
+}

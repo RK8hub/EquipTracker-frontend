@@ -1,0 +1,41 @@
+@reference "../../tokens/tokens.css";
+
+.eq-card-operador {
+  @apply flex min-h-[300px] w-full max-w-[200px] flex-col items-center justify-start gap-[27px] rounded-[24px] bg-object p-5 text-primary;
+}
+
+.eq-card-operador__actions {
+  @apply flex w-full items-center justify-between;
+}
+
+.eq-card-operador__more {
+  @apply flex size-10 cursor-pointer items-center justify-center rounded-[14px] border border-stroke text-primary outline-none transition-colors;
+}
+
+.eq-card-operador__more:hover {
+  @apply bg-border/60;
+}
+
+.eq-card-operador__more:focus-visible {
+  @apply ring-[3px] ring-zinc-400/50;
+}
+
+.eq-card-operador__more svg {
+  @apply size-4;
+}
+
+.eq-card-operador__avatar {
+  @apply flex size-16 shrink-0 items-center justify-center rounded-full bg-avatar-solid text-2xl font-semibold text-avatar-icon;
+}
+
+.eq-card-operador__info {
+  @apply flex w-full min-w-0 flex-col items-center;
+}
+
+.eq-card-operador__name {
+  @apply max-w-full truncate text-base font-normal;
+}
+
+.eq-card-operador__area {
+  @apply max-w-full truncate text-xs font-normal;
+}

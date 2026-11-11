@@ -1,0 +1,13 @@
+@reference "../../tokens/tokens.css";
+
+.eq-footer {
+  @apply flex w-full flex-wrap items-center justify-between gap-6 text-foreground;
+}
+
+.eq-footer__summary {
+  @apply text-xs font-normal;
+}
+
+.eq-footer__actions {
+  @apply flex items-start gap-3.5;
+}

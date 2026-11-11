@@ -1,0 +1,17 @@
+@reference "../../tokens/tokens.css";
+
+.eq-info-card {
+  @apply flex h-[136px] w-full max-w-[230px] flex-col items-center justify-evenly gap-1 rounded-[12px] bg-card-inverse px-11 py-1.5 text-primary-foreground;
+}
+
+.eq-info-card__icon {
+  @apply flex size-8 items-center justify-center;
+}
+
+.eq-info-card__quantity {
+  @apply text-[57px] leading-16 font-medium tracking-[-0.25px];
+}
+
+.eq-info-card__label {
+  @apply text-center text-sm leading-5 font-normal;
+}
