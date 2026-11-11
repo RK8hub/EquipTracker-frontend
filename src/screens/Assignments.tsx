@@ -24,9 +24,9 @@ const emptyForm: AssignmentForm = {
 export function AssignmentsScreen() {
   const { data, loading, error, reload } = useAsync(async () => {
     const [assignments, equipment, operators] = await Promise.all([
-      api.assignments.list(0, 100),
-      api.equipment.list(0, 100),
-      api.operators.list(0, 100),
+      api.assignments.list(0, 1000),
+      api.equipment.list(0, 1000),
+      api.operators.list(0, 1000),
     ]);
     return { assignments, equipment, operators };
   }, []);

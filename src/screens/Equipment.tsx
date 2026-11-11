@@ -41,11 +41,11 @@ export function EquipmentScreen() {
   const { data, loading, error, reload } = useAsync(async () => {
     const [equipment, specs, operators, assignments, incidents] =
       await Promise.all([
-        api.equipment.list(0, 100),
-        api.specs.list(0, 100),
-        api.operators.list(0, 100),
-        api.assignments.list(0, 100),
-        api.incidents.list(0, 100),
+        api.equipment.list(0, 1000),
+        api.specs.list(0, 1000),
+        api.operators.list(0, 1000),
+        api.assignments.list(0, 1000),
+        api.incidents.list(0, 1000),
       ]);
     return { equipment, specs, operators, assignments, incidents };
   }, []);

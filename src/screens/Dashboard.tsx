@@ -21,10 +21,10 @@ const viewLabels: Record<View, string> = {
 export function DashboardScreen() {
   const { data, loading, error, reload } = useAsync(async () => {
     const [operators, equipment, assignments, incidents] = await Promise.all([
-      api.operators.list(0, 100),
-      api.equipment.list(0, 100),
-      api.assignments.list(0, 100),
-      api.incidents.list(0, 100),
+      api.operators.list(0, 1000),
+      api.equipment.list(0, 1000),
+      api.assignments.list(0, 1000),
+      api.incidents.list(0, 1000),
     ]);
     return { operators, equipment, assignments, incidents };
   }, []);

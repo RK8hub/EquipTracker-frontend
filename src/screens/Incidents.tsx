@@ -29,9 +29,9 @@ const emptyForm: IncidentForm = {
 export function IncidentsScreen() {
   const { data, loading, error, reload } = useAsync(async () => {
     const [incidents, equipment, operators] = await Promise.all([
-      api.incidents.list(0, 100),
-      api.equipment.list(0, 100),
-      api.operators.list(0, 100),
+      api.incidents.list(0, 1000),
+      api.equipment.list(0, 1000),
+      api.operators.list(0, 1000),
     ]);
     return { incidents, equipment, operators };
   }, []);

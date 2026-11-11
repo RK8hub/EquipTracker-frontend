@@ -20,9 +20,9 @@ const emptyForm: OperatorForm = { name: "", department: "", position: "" };
 export function OperatorsScreen() {
   const { data, loading, error, reload } = useAsync(async () => {
     const [operators, assignments, incidents] = await Promise.all([
-      api.operators.list(0, 100),
-      api.assignments.list(0, 100),
-      api.incidents.list(0, 100),
+      api.operators.list(0, 1000),
+      api.assignments.list(0, 1000),
+      api.incidents.list(0, 1000),
     ]);
     return { operators, assignments, incidents };
   }, []);
