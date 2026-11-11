@@ -11,6 +11,9 @@ import { DropdownButton } from "../DropdownButton/DropdownButton";
 import { cn } from "../../lib/cn";
 import "./select.css";
 
+// Registro global para que solo un Select esté abierto a la vez.
+const openSelects = new Set<() => void>();
+
 export interface SelectOption {
   value: string;
   label: string;
@@ -42,6 +45,7 @@ export function SelectField({
   const triggerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const [pos, setPos] = useState({ top: 0, left: 0, width: 0 });
+  const closeRef = useRef<() => void>(() => setOpen(false));
 
   const selected = options.find((o) => o.value === value);
   const displayLabel = selected ? selected.label : (placeholder ?? "");
@@ -49,6 +53,15 @@ export function SelectField({
   const items = placeholder
     ? [{ value: "", label: placeholder }, ...options]
     : options;
+
+  useEffect(() => {
+    const close = () => setOpen(false);
+    closeRef.current = close;
+    openSelects.add(close);
+    return () => {
+      openSelects.delete(close);
+    };
+  }, []);
 
   const updatePos = useCallback(() => {
     const r = triggerRef.current?.getBoundingClientRect();
@@ -134,7 +147,15 @@ export function SelectField({
           label={displayLabel}
           open={open}
           disabled={disabled}
-          onClick={() => !disabled && setOpen((o) => !o)}
+          onClick={() => {
+          if (disabled) return;
+          if (!open) {
+            openSelects.forEach((c) => {
+              if (c !== closeRef.current) c();
+            });
+          }
+          setOpen((o) => !o);
+        }}
           onKeyDown={onKeyDown}
           className="w-full justify-between"
         />
@@ -151,6 +172,7 @@ export function SelectField({
               top: pos.top,
               left: pos.left,
               minWidth: pos.width,
+              maxWidth: "min(420px, calc(100vw - 16px))",
               zIndex: 9999,
             }}
             className="eq-select__list"
@@ -167,8 +189,9 @@ export function SelectField({
                 )}
                 onMouseEnter={() => setHighlight(i)}
                 onClick={() => choose(o.value)}
+              title={o.label}
               >
-                {o.label}
+                <span className="block truncate">{o.label}</span>
               </li>
             ))}
           </ul>,
