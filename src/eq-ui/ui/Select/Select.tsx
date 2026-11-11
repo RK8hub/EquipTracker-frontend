@@ -113,6 +113,8 @@ export function SelectField({
     if (e.key === "ArrowDown") {
       e.preventDefault();
       if (!open) {
+        const r = triggerRef.current?.getBoundingClientRect();
+        if (r) setPos({ top: r.bottom + 4, left: r.left, width: r.width });
         setOpen(true);
         setHighlight(items.findIndex((o) => o.value === value));
       } else {
@@ -121,6 +123,8 @@ export function SelectField({
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
       if (!open) {
+        const r = triggerRef.current?.getBoundingClientRect();
+        if (r) setPos({ top: r.bottom + 4, left: r.left, width: r.width });
         setOpen(true);
         setHighlight(items.findIndex((o) => o.value === value));
       } else {
@@ -129,6 +133,8 @@ export function SelectField({
     } else if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
       if (!open) {
+        const r = triggerRef.current?.getBoundingClientRect();
+        if (r) setPos({ top: r.bottom + 4, left: r.left, width: r.width });
         setOpen(true);
         setHighlight(items.findIndex((o) => o.value === value));
       } else if (highlight >= 0) {
@@ -153,6 +159,8 @@ export function SelectField({
             openSelects.forEach((c) => {
               if (c !== closeRef.current) c();
             });
+            const r = triggerRef.current?.getBoundingClientRect();
+            if (r) setPos({ top: r.bottom + 4, left: r.left, width: r.width });
           }
           setOpen((o) => !o);
         }}
