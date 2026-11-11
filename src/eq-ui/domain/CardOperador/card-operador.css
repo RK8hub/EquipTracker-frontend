@@ -1,7 +1,7 @@
 @reference "../../tokens/tokens.css";
 
 .eq-card-operador {
-  @apply flex min-h-[300px] w-[200px] shrink-0 flex-col items-center justify-start gap-[27px] rounded-[24px] bg-object p-5 text-primary;
+  @apply flex min-h-[300px] w-full max-w-[200px] flex-col items-center justify-start gap-[27px] rounded-[24px] bg-object p-5 text-primary;
 }
 
 .eq-card-operador__actions {
