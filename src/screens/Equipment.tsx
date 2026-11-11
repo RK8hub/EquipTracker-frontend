@@ -126,10 +126,6 @@ export function EquipmentScreen() {
       toast.error("Completa serial, marca y modelo.");
       return;
     }
-    if (!specsId) {
-      toast.error("Selecciona o crea una especificación.");
-      return;
-    }
 
     setBusy(true);
     try {
@@ -137,7 +133,7 @@ export function EquipmentScreen() {
         serial: form.serial.trim().toUpperCase(),
         brand: form.brand.trim(),
         model: form.model.trim(),
-        specs_id: specsId,
+        specs_id: specsId || null,
       };
       if (form.id) {
         await api.equipment.update(form.id, payload);
@@ -338,7 +334,7 @@ export function EquipmentScreen() {
               label: specsLabel(spec),
             }))}
             placeholder={
-              data.specs.length ? "Selecciona una especificación" : "Sin especificaciones"
+              data.specs.length ? "Sin especificación" : "Sin especificaciones"
             }
           />
 

@@ -74,7 +74,7 @@ export interface EquipmentInput {
   serial: string;
   brand: string;
   model: string;
-  specs_id: number;
+  specs_id: number | null;
 }
 
 export interface Assignment {
