@@ -191,7 +191,7 @@ export function OperatorsScreen() {
           Sin operadores registrados.
         </p>
       ) : (
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap justify-center gap-4">
           {filtered.map((operator) => (
             <CardOperador
               key={operator.id}
