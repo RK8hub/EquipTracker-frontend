@@ -10,6 +10,7 @@ export * from "./LoginPanel";
 export * from "./NavigationButton";
 export * from "./Popup";
 export * from "./SearchBar";
+export * from "./Select";
 export * from "./Sidebar";
 export * from "./Tab";
 export * from "./Tag";

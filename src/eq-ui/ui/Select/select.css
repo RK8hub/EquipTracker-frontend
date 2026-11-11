@@ -1,0 +1,21 @@
+@reference "../../tokens/tokens.css";
+
+.eq-select__list {
+  @apply max-h-60 overflow-auto rounded-[8px] border border-stroke bg-object py-1 text-base text-primary shadow-lg;
+}
+
+.eq-select__option {
+  @apply cursor-pointer px-3 py-2 transition-colors;
+}
+
+.eq-select__option:hover {
+  @apply bg-border/60;
+}
+
+.eq-select__option--selected {
+  @apply bg-border/40 font-medium;
+}
+
+.eq-select__option--highlight {
+  @apply bg-border/60;
+}
