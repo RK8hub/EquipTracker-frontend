@@ -28,6 +28,9 @@ export function CardOperador({
   ...props
 }: CardOperadorProps) {
   const visibleTags = tags.filter((tag) => Number(tag.quantity) > 0);
+  const parts = name.trim().split(/\s+/);
+  const shortName =
+    parts.length > 2 ? `${parts[0]} ${parts[parts.length - 1]}` : name;
 
   return (
     <div className={cn("eq-card-operador", className)} {...props}>
@@ -50,7 +53,7 @@ export function CardOperador({
       <div className="eq-card-operador__avatar">{initials}</div>
 
       <div className="eq-card-operador__info">
-        <span className="eq-card-operador__name">{name}</span>
+        <span className="eq-card-operador__name" title={name}>{shortName}</span>
         <span className="eq-card-operador__area">{area}</span>
       </div>
 
