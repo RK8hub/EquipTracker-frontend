@@ -24,4 +24,5 @@ log = "0.4"
 tauri = { version = "2.12", features = [] }
 tauri-plugin-log = "2"
 tauri-plugin-store = "2.5"
-tauri-plugin-http = { version = "2", features = ["unsafe-headers"] }
+tauri-plugin-http = "2"
+keyring = { version = "3.6", features = ["apple-native", "windows-native", "sync-secret-service", "linux-native", "crypto-rust"] }

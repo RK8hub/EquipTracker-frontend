@@ -51,7 +51,7 @@ export function EquipmentScreen() {
   }, []);
 
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"modelo" | "serial" | "operador">("modelo");
+  const [sortBy, setSortBy] = useState<"modelo" | "serial" | "operador" | "estado">("modelo");
   const [sortOpen, setSortOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [form, setForm] = useState<EquipmentForm | null>(null);
@@ -103,18 +103,28 @@ export function EquipmentScreen() {
           : undefined;
         return operator?.name ?? "Sin asignar";
       };
+      const isAssigned = (equipmentId: number) =>
+        data.assignments.some(
+          (item) => item.equipment_id === equipmentId && item.status === "active",
+        )
+          ? 1
+          : 0;
       const av =
         sortBy === "modelo"
           ? `${a.brand} ${a.model}`
           : sortBy === "serial"
             ? a.serial
-            : operatorName(a.id);
+            : sortBy === "operador"
+              ? operatorName(a.id)
+              : isAssigned(a.id);
       const bv =
         sortBy === "modelo"
           ? `${b.brand} ${b.model}`
           : sortBy === "serial"
             ? b.serial
-            : operatorName(b.id);
+            : sortBy === "operador"
+              ? operatorName(b.id)
+              : isAssigned(b.id);
       return String(av).localeCompare(String(bv), "es", { sensitivity: "base" });
     });
 
@@ -201,24 +211,28 @@ export function EquipmentScreen() {
                   ? "Modelo"
                   : sortBy === "serial"
                     ? "Serial"
-                    : "Operador"
+                    : sortBy === "operador"
+                      ? "Operador"
+                      : "Estado"
               }
+              title="Ordenar por este criterio"
               open={sortOpen}
               onClick={() => setSortOpen((value) => !value)}
             />
             {sortOpen && (
-              <div className="absolute right-0 top-[46px] z-10 w-40 rounded-[8px] border border-stroke bg-object p-1 shadow-lg">
+              <div className="absolute right-0 top-11.5 z-10 w-40 rounded-[8px] border border-stroke bg-object p-1 shadow-lg">
                 {[
                   { value: "modelo", label: "Modelo" },
                   { value: "serial", label: "Serial" },
                   { value: "operador", label: "Operador" },
+                  { value: "estado", label: "Estado" },
                 ].map((option) => (
                   <button
                     key={option.value}
                     type="button"
-                    className="flex w-full cursor-pointer rounded-[6px] px-3 py-2 text-left text-sm text-primary transition-colors hover:bg-border/60"
+                    className="flex w-full cursor-pointer rounded-md px-3 py-2 text-left text-sm text-primary transition-colors hover:bg-border/60"
                     onClick={() => {
-                      setSortBy(option.value as "modelo" | "serial" | "operador");
+                      setSortBy(option.value as "modelo" | "serial" | "operador" | "estado");
                       setSortOpen(false);
                     }}
                   >
@@ -236,7 +250,7 @@ export function EquipmentScreen() {
           Sin equipos registrados.
         </p>
       ) : (
-        <div className="flex flex-wrap gap-4 justify-between items-center">
+        <div className="flex flex-wrap gap-10 justify-start items-center">
           {filtered.map((equipment) => {
             const active = activeAssignmentByEquipment.get(equipment.id);
             const operatorName = active
@@ -245,7 +259,7 @@ export function EquipmentScreen() {
             return (
               <CardEquipment
                 key={equipment.id}
-                name={`${equipment.model}`}
+                name={`${equipment.brand}`}
                 operator={`${operatorName}`}
                 incidents={openIncidentsByEquipment.get(equipment.id) ?? 0}
                 selected={selected.includes(String(equipment.id))}

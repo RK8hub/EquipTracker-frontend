@@ -16,6 +16,13 @@ export interface Operator {
   position: string;
 }
 
+export interface User {
+  id: number;
+  email: string;
+  role: string;
+  created_at: string;
+}
+
 export interface OperatorInput {
   name: string;
   department: string;
@@ -90,7 +97,7 @@ export interface Assignment {
 export interface AssignmentInput {
   equipment_id: number;
   operator_id: number;
-  assigned_by: number;
+  assigned_by?: number;
   assigned_at?: string | null;
 }
 

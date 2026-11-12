@@ -14,6 +14,7 @@ import type {
   Specs,
   SpecsInput,
   TokenResponse,
+  User,
 } from "../types";
 
 const isTauri = () =>
@@ -118,6 +119,10 @@ export const api = {
       { method: "POST", body: JSON.stringify({ email, password }) },
       false,
     ),
+
+  users: {
+    list: () => list<User>("/auth/users", 0, 100),
+  },
 
   operators: {
     list: (skip = 0, limit = 100) => list<Operator>("/operators", skip, limit),

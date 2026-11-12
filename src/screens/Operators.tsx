@@ -158,7 +158,7 @@ export function OperatorsScreen() {
                     ? "Departamento"
                     : "Puesto"
               }
-              open={sortOpen}
+              title="Ordenar por este criterio (no filtra)" open={sortOpen}
               onClick={() => setSortOpen((value) => !value)}
             />
             {sortOpen && (
@@ -191,7 +191,7 @@ export function OperatorsScreen() {
           Sin operadores registrados.
         </p>
       ) : (
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-15 justify-start items-center ">
           {filtered.map((operator) => (
             <CardOperador
               key={operator.id}

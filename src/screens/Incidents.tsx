@@ -197,7 +197,7 @@ export function IncidentsScreen() {
                             ? "Estado"
                             : "Fecha"
                   }
-                  open={sortOpen}
+                  title="Ordenar por este criterio (no filtra)" open={sortOpen}
                   onClick={() => setSortOpen((value) => !value)}
                 />
                 {sortOpen && (

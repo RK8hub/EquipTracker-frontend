@@ -28,7 +28,13 @@ export function AssignmentsScreen() {
       api.equipment.list(0, 1000),
       api.operators.list(0, 1000),
     ]);
-    return { assignments, equipment, operators };
+    let users: { id: number; email: string; role: string; created_at: string }[] = [];
+    try {
+      users = await api.users.list();
+    } catch {
+      users = [];
+    }
+    return { assignments, equipment, operators, users };
   }, []);
 
   const [search, setSearch] = useState("");
@@ -43,6 +49,7 @@ export function AssignmentsScreen() {
 
   const equipmentById = new Map(data.equipment.map((item) => [item.id, item]));
   const operatorById = new Map(data.operators.map((item) => [item.id, item]));
+  const userById = new Map(data.users.map((item) => [item.id, item]));
 
   const assignedEquipmentIds = new Set(
     data.assignments
@@ -55,8 +62,8 @@ export function AssignmentsScreen() {
     .filter((assignment) => {
       const equipment = equipmentById.get(assignment.equipment_id);
       const operator = operatorById.get(assignment.operator_id);
-      const assigner = operatorById.get(assignment.assigned_by);
-      return `${equipment?.brand ?? ""} ${equipment?.model ?? ""} ${equipment?.serial ?? ""} ${operator?.name ?? ""} ${assigner?.name ?? ""}`
+      const assigner = userById.get(assignment.assigned_by);
+      return `${equipment?.brand ?? ""} ${equipment?.model ?? ""} ${equipment?.serial ?? ""} ${operator?.name ?? ""} ${assigner?.email ?? ""}`
         .toLowerCase()
         .includes(term);
     })
@@ -93,7 +100,7 @@ export function AssignmentsScreen() {
     id: String(assignment.id),
     equipo: equipmentLabel(equipmentById.get(assignment.equipment_id), assignment.equipment_id),
     operador: operatorLabel(operatorById.get(assignment.operator_id), assignment.operator_id),
-    asignador: operatorLabel(operatorById.get(assignment.assigned_by), assignment.assigned_by),
+    asignador: userById.get(assignment.assigned_by)?.email ?? `Usuario #${assignment.assigned_by}`,
     estado: assignment.status === "active" ? "Activo" : "Devuelto",
     fecha: formatDate(assignment.assigned_at),
     accion:
@@ -189,7 +196,7 @@ export function AssignmentsScreen() {
                           ? "Estado"
                           : "Fecha"
                   }
-                  open={sortOpen}
+                  title="Ordenar por este criterio (no filtra)" open={sortOpen}
                   onClick={() => setSortOpen((value) => !value)}
                 />
                 {sortOpen && (
@@ -266,13 +273,20 @@ export function AssignmentsScreen() {
             placeholder="Selecciona un operador"
           />
           <SelectField
-            label="Asignado por"
+            label="Asignador"
             value={form.assigned_by}
             onChange={(value) =>
               setForm((current) => (current ? { ...current, assigned_by: value } : current))
             }
-            options={operatorOptions}
-            placeholder="Selecciona quién entrega"
+            options={data.users.map((user) => ({
+              value: String(user.id),
+              label: user.email,
+            }))}
+            placeholder={
+              data.users.length === 0
+                ? "No se pudieron cargar los usuarios"
+                : "Selecciona quién entrega"
+            }
           />
         </ModalCard>
       )}

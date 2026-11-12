@@ -4,7 +4,14 @@ import { Button, Popup, Sidebar, type SidebarItem } from "./eq-ui";
 import { api, configureApi } from "./api/client";
 import { errorMessage } from "./hooks";
 import { contrastColor } from "./lib/format";
-import { getStored, removeStored, setStored } from "./lib/storage";
+import {
+  getAuthToken,
+  getStored,
+  removeAuthToken,
+  removeStored,
+  setAuthToken,
+  setStored,
+} from "./lib/storage";
 import { equiptrackerNavigation } from "./eq-ui/domain/navigation";
 import { ConnectScreen } from "./screens/Connect";
 import { DashboardScreen } from "./screens/Dashboard";
@@ -46,11 +53,12 @@ export function App() {
     (async () => {
       const [storedUrl, storedToken, storedEmail, storedPage, storedCompany] = await Promise.all([
         getStored<string>("baseUrl"),
-        getStored<string>("token"),
+        getAuthToken(),
         getStored<string>("email"),
         getStored<string>("page"),
         getStored<string>("company"),
       ]);
+      void removeStored("token"); // Limpia tokens de versiones anteriores.
       if (!active) return;
       configureApi({ baseUrl: storedUrl ?? "", token: storedToken });
       setBaseUrl(storedUrl);
@@ -78,7 +86,7 @@ export function App() {
   useEffect(() => {
     const handler = () => {
       if (!token) return;
-      void removeStored("token");
+      void removeAuthToken();
       void removeStored("page");
       configureApi({ token: null });
       setToken(null);
@@ -91,7 +99,7 @@ export function App() {
 
   async function handleConnected(url: string) {
     await setStored("baseUrl", url);
-    await removeStored("token");
+    await removeAuthToken();
     await removeStored("email");
     configureApi({ baseUrl: url, token: null });
     setBaseUrl(url);
@@ -100,7 +108,7 @@ export function App() {
   }
 
   async function handleLoggedIn(nextToken: string, nextEmail: string) {
-    await setStored("token", nextToken);
+    await setAuthToken(nextToken);
     await setStored("email", nextEmail);
     configureApi({ token: nextToken });
     setToken(nextToken);
@@ -108,7 +116,7 @@ export function App() {
   }
 
   async function handleLogout() {
-    await removeStored("token");
+    await removeAuthToken();
     await removeStored("email");
     await removeStored("page");
     configureApi({ token: null });
@@ -119,7 +127,7 @@ export function App() {
 
   async function handleChangeServer() {
     await removeStored("baseUrl");
-    await removeStored("token");
+    await removeAuthToken();
     await removeStored("email");
     await removeStored("page");
     configureApi({ baseUrl: "", token: null });
@@ -189,7 +197,14 @@ export function App() {
           name: "EquipTracker",
           company: companyName || email.split("@")[1] || baseUrl || "",
         }}
-        user={{ name: email.split("@")[0] || "Usuario", email }}
+        user={{
+          name:
+            (email.split("@")[0] || "Usuario")
+              .split(".")
+              .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+              .join(" ") || "Usuario",
+          email,
+        }}
         items={items}
         onNavigate={(id) => setPage(id as PageId)}
         onUserClick={() => setPage("ajustes")}
