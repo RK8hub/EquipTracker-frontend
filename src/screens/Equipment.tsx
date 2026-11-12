@@ -51,7 +51,7 @@ export function EquipmentScreen() {
   }, []);
 
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"modelo" | "serial" | "estado">("modelo");
+  const [sortBy, setSortBy] = useState<"modelo" | "serial" | "operador">("modelo");
   const [sortOpen, setSortOpen] = useState(false);
   const [selected, setSelected] = useState<string[]>([]);
   const [form, setForm] = useState<EquipmentForm | null>(null);
@@ -88,28 +88,27 @@ export function EquipmentScreen() {
         .includes(term),
     )
     .sort((a, b) => {
+      const operatorName = (equipmentId: number) => {
+        const assignment = data.assignments.find(
+          (item) => item.equipment_id === equipmentId && item.status === "active",
+        );
+        const operator = assignment
+          ? data.operators.find((item) => item.id === assignment.operator_id)
+          : undefined;
+        return operator?.name ?? "Sin asignar";
+      };
       const av =
         sortBy === "modelo"
           ? `${a.brand} ${a.model}`
           : sortBy === "serial"
             ? a.serial
-            : data.assignments.some(
-                (assignment) =>
-                  assignment.equipment_id === a.id && assignment.status === "active",
-              )
-              ? "Asignado"
-              : "Disponible";
+            : operatorName(a.id);
       const bv =
         sortBy === "modelo"
           ? `${b.brand} ${b.model}`
           : sortBy === "serial"
             ? b.serial
-            : data.assignments.some(
-                (assignment) =>
-                  assignment.equipment_id === b.id && assignment.status === "active",
-              )
-              ? "Asignado"
-              : "Disponible";
+            : operatorName(b.id);
       return String(av).localeCompare(String(bv), "es", { sensitivity: "base" });
     });
 
@@ -196,7 +195,7 @@ export function EquipmentScreen() {
                   ? "Modelo"
                   : sortBy === "serial"
                     ? "Serial"
-                    : "Estado"
+                    : "Operador"
               }
               open={sortOpen}
               onClick={() => setSortOpen((value) => !value)}
@@ -206,14 +205,14 @@ export function EquipmentScreen() {
                 {[
                   { value: "modelo", label: "Modelo" },
                   { value: "serial", label: "Serial" },
-                  { value: "estado", label: "Estado" },
+                  { value: "operador", label: "Operador" },
                 ].map((option) => (
                   <button
                     key={option.value}
                     type="button"
                     className="flex w-full cursor-pointer rounded-[6px] px-3 py-2 text-left text-sm text-primary transition-colors hover:bg-border/60"
                     onClick={() => {
-                      setSortBy(option.value as "modelo" | "serial" | "estado");
+                      setSortBy(option.value as "modelo" | "serial" | "operador");
                       setSortOpen(false);
                     }}
                   >
@@ -231,7 +230,7 @@ export function EquipmentScreen() {
           Sin equipos registrados.
         </p>
       ) : (
-        <div className="flex flex-wrap gap-4">
+        <div className="flex flex-wrap gap-4 justify-between items-center">
           {filtered.map((equipment) => {
             const active = activeAssignmentByEquipment.get(equipment.id);
             const operatorName = active
