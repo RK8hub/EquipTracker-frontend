@@ -84,17 +84,19 @@ export function IncidentsScreen() {
 
   const columns: DataTableColumn[] = [
     { key: "equipo", header: "Equipo" },
+    { key: "serial", header: "Serial" },
     { key: "tipo", header: "Tipo" },
     { key: "motivo", header: "Motivo" },
     { key: "tecnico", header: "Técnico" },
     { key: "estado", header: "Estado" },
     { key: "fecha", header: "Fecha" },
-    { key: "accion", header: "Acción" },
+    { key: "accion", header: "Acción", className: "justify-center" },
   ];
 
   const rows: DataTableRow[] = visible.map((incident) => ({
     id: String(incident.id),
     equipo: equipmentLabel(equipmentById.get(incident.equipment_id), incident.equipment_id),
+    serial: equipmentById.get(incident.equipment_id)?.serial ?? "",
     tipo: incident.type,
     motivo: incident.reason,
     tecnico: operatorLabel(operatorById.get(incident.technician_id), incident.technician_id),

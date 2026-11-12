@@ -89,16 +89,18 @@ export function AssignmentsScreen() {
 
   const columns: DataTableColumn[] = [
     { key: "equipo", header: "Equipo" },
+    { key: "serial", header: "Serial" },
     { key: "operador", header: "Operador" },
     { key: "asignador", header: "Asignador" },
     { key: "estado", header: "Estado" },
     { key: "fecha", header: "Fecha" },
-    { key: "accion", header: "Acción" },
+    { key: "accion", header: "Acción", className: "justify-center" },
   ];
 
   const rows: DataTableRow[] = visible.map((assignment) => ({
     id: String(assignment.id),
     equipo: equipmentLabel(equipmentById.get(assignment.equipment_id), assignment.equipment_id),
+    serial: equipmentById.get(assignment.equipment_id)?.serial ?? "",
     operador: operatorLabel(operatorById.get(assignment.operator_id), assignment.operator_id),
     asignador:
       (userById.get(assignment.assigned_by)?.email ?? "")

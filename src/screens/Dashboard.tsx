@@ -7,7 +7,7 @@ import { formatDate, operatorLabel, equipmentLabel } from "../lib/format";
 import { exportToCsv } from "../lib/csv";
 import { ErrorState, Loading } from "../components/Feedback";
 import { Page } from "../components/Page";
-import type { Operator } from "../types";
+import type { Operator, Specs } from "../types";
 
 type View = "assignments" | "operators" | "equipment" | "incidents";
 
@@ -20,13 +20,14 @@ const viewLabels: Record<View, string> = {
 
 export function DashboardScreen() {
   const { data, loading, error, reload } = useAsync(async () => {
-    const [operators, equipment, assignments, incidents] = await Promise.all([
+    const [operators, equipment, assignments, incidents, specs] = await Promise.all([
       api.operators.list(0, 1000),
       api.equipment.list(0, 1000),
       api.assignments.list(0, 1000),
       api.incidents.list(0, 1000),
+      api.specs.list(0, 1000),
     ]);
-    return { operators, equipment, assignments, incidents };
+    return { operators, equipment, assignments, incidents, specs };
   }, []);
 
   const [view, setView] = useState<View>("assignments");
@@ -44,6 +45,9 @@ export function DashboardScreen() {
   const equipmentById = new Map(
     data.equipment.map((item) => [item.id, item]),
   );
+  const specsById = new Map<number, Specs>(
+    data.specs.map((spec) => [spec.id, spec]),
+  );
 
   const term = search.trim().toLowerCase();
 
@@ -53,6 +57,7 @@ export function DashboardScreen() {
   if (view === "assignments") {
     columns = [
       { key: "equipo", header: "Equipo" },
+      { key: "serial", header: "Serial" },
       { key: "operador", header: "Operador" },
       { key: "asignador", header: "Asignador" },
       { key: "estado", header: "Estado" },
@@ -69,6 +74,7 @@ export function DashboardScreen() {
       .map((assignment) => ({
         id: String(assignment.id),
         equipo: equipmentLabel(equipmentById.get(assignment.equipment_id), assignment.equipment_id),
+        serial: equipmentById.get(assignment.equipment_id)?.serial ?? "",
         operador: operatorLabel(operatorById.get(assignment.operator_id), assignment.operator_id),
         asignador: operatorLabel(operatorById.get(assignment.assigned_by), assignment.assigned_by),
         estado: assignment.status === "active" ? "Activo" : "Devuelto",
@@ -94,25 +100,37 @@ export function DashboardScreen() {
     columns = [
       { key: "equipo", header: "Equipo" },
       { key: "serial", header: "Serial" },
+      { key: "cpu", header: "CPU" },
+      { key: "ram", header: "RAM" },
+      { key: "almacenamiento", header: "Almacenamiento" },
+      { key: "graficos", header: "Graficos" },
       { key: "estado", header: "Estado" },
     ];
     rows = data.equipment
       .filter((item) =>
         `${item.brand} ${item.model} ${item.serial}`.toLowerCase().includes(term),
       )
-      .map((item) => ({
+      .map((item) => {
+        const spec = item.specs_id != null ? specsById.get(item.specs_id) : undefined;
+        return {
         id: String(item.id),
         equipo: `${item.brand} ${item.model}`,
         serial: item.serial,
+        cpu: spec ? `${spec.cpu.brand} ${spec.cpu.model}` : "",
+        ram: spec ? `${spec.ram.capacity.value} ${spec.ram.capacity.unit} ${spec.ram.mode}` : "",
+        almacenamiento: spec ? `${spec.storage.capacity.value} ${spec.storage.capacity.unit} ${spec.storage.type}` : "",
+        graficos: spec ? `${spec.graphics.brand} ${spec.graphics.model} (${spec.graphics.type})` : "",
         estado: data.assignments.some(
           (assignment) => assignment.equipment_id === item.id && assignment.status === "active",
         )
           ? "Asignado"
           : "Disponible",
-      }));
+        };
+      });
   } else {
     columns = [
       { key: "equipo", header: "Equipo" },
+      { key: "serial", header: "Serial" },
       { key: "tipo", header: "Tipo" },
       { key: "motivo", header: "Motivo" },
       { key: "tecnico", header: "Técnico" },
@@ -130,6 +148,7 @@ export function DashboardScreen() {
       .map((incident) => ({
         id: String(incident.id),
         equipo: equipmentLabel(equipmentById.get(incident.equipment_id), incident.equipment_id),
+        serial: equipmentById.get(incident.equipment_id)?.serial ?? "",
         tipo: incident.type,
         motivo: incident.reason,
         tecnico: operatorLabel(operatorById.get(incident.technician_id), incident.technician_id),
