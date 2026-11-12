@@ -18,6 +18,7 @@ export interface SidebarProps extends HTMLAttributes<HTMLElement> {
   items: SidebarItem[];
   onNavigate?: (id: string) => void;
   onUserClick?: () => void;
+  onWorkspaceClick?: () => void;
 }
 
 function initials(name: string) {
@@ -31,6 +32,7 @@ export function Sidebar({
   items,
   onNavigate,
   onUserClick,
+  onWorkspaceClick,
   className,
   ...props
 }: SidebarProps) {
@@ -45,7 +47,13 @@ export function Sidebar({
   return (
     <aside className={cn("eq-sidebar", className)} {...props}>
       {workspace && (
-        <button type="button" className="eq-sidebar__workspace">
+        <button
+          type="button"
+          className="eq-sidebar__workspace"
+          onClick={onWorkspaceClick}
+          disabled={!onWorkspaceClick}
+          aria-disabled={!onWorkspaceClick}
+        >
           <span className="eq-sidebar__workspace-icon">
             {workspaceIcon ?? initials(workspace.name)}
           </span>

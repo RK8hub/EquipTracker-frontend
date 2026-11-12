@@ -23,7 +23,7 @@ export interface ConectBoxProps
 export function ConectBox({
   title = "Conectar servidor",
   description = "Ingresa la dirección IP del servidor para conectar el backend de EquipTracker",
-  fieldLabel = "Backend IP",
+  fieldLabel = "IP del backend",
   placeholder = "192.168.0.120",
   submitLabel = "Conectar",
   cancelLabel = "Probar Conexion",

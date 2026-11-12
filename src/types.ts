@@ -23,6 +23,12 @@ export interface User {
   created_at: string;
 }
 
+export interface UserInput {
+  email: string;
+  password: string;
+  role?: string;
+}
+
 export interface OperatorInput {
   name: string;
   department: string;

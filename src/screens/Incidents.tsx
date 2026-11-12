@@ -2,6 +2,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Button, DataTable, Header, type DataTableColumn, type DataTableRow } from "../eq-ui";
 import { SortDropdown } from "../components/SortDropdown";
+import { incidentColumns, incidentRow } from "../tables/incidents";
 import { api } from "../api/client";
 import { errorMessage, useAsync, useSort } from "../hooks";
 import { equipmentLabel, formatDate, operatorLabel } from "../lib/format";
@@ -85,25 +86,12 @@ export function IncidentsScreen() {
     });
 
   const columns: DataTableColumn[] = [
-    { key: "equipo", header: "Equipo" },
-    { key: "serial", header: "Serial" },
-    { key: "tipo", header: "Tipo" },
-    { key: "motivo", header: "Motivo" },
-    { key: "tecnico", header: "Técnico" },
-    { key: "estado", header: "Estado" },
-    { key: "fecha", header: "Fecha" },
+    ...incidentColumns,
     { key: "accion", header: "Acción", className: "justify-center" },
   ];
 
   const rows: DataTableRow[] = visible.map((incident) => ({
-    id: String(incident.id),
-    equipo: equipmentLabel(equipmentById.get(incident.equipment_id), incident.equipment_id),
-    serial: equipmentById.get(incident.equipment_id)?.serial ?? "",
-    tipo: incident.type,
-    motivo: incident.reason,
-    tecnico: operatorLabel(operatorById.get(incident.technician_id), incident.technician_id),
-    estado: incident.status === "open" ? "Abierta" : "Cerrada",
-    fecha: formatDate(incident.created_at),
+    ...incidentRow(incident, { equipmentById, operatorById }),
     accion:
       incident.status === "open" ? (
         <Button

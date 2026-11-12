@@ -15,6 +15,7 @@ import type {
   SpecsInput,
   TokenResponse,
   User,
+  UserInput,
 } from "../types";
 
 const isTauri = () =>
@@ -122,6 +123,13 @@ export const api = {
 
   users: {
     list: () => list<User>("/auth/users", 0, 100),
+    create: (input: UserInput) => create<User, UserInput>("/auth/users", input),
+    delete: (id: number) => remove(`/auth/users/${id}`),
+    changePassword: (id: number, password: string) =>
+      request<User>(`/auth/users/${id}/password`, {
+        method: "PATCH",
+        body: JSON.stringify({ password }),
+      }),
   },
 
   operators: {

@@ -23,7 +23,8 @@ export function Footer({
   return (
     <footer className={cn("eq-footer", className)} {...props}>
       <span className="eq-footer__summary">
-        {summary ?? `${count} of ${total} row(s) seleccionados.`}
+        {summary ?? `${count} de ${total} fila(s) seleccionadas.`}
+        {summary ? ` · ${count} seleccionada(s)` : ""}
       </span>
       <div className="eq-footer__actions">
         <NavigationButton direction="previous" onClick={onPrevious} />

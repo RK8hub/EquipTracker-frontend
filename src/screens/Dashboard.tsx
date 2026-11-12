@@ -7,6 +7,7 @@ import { formatDate, operatorLabel, equipmentLabel } from "../lib/format";
 import { exportToCsv } from "../lib/csv";
 import { toMap } from "../lib/lookups";
 import { assignmentColumns, assignmentRow } from "../tables/assignments";
+import { incidentColumns, incidentRow } from "../tables/incidents";
 import { ErrorState, Loading } from "../components/Feedback";
 import { Page } from "../components/Page";
 import type { Operator, Specs } from "../types";
@@ -117,15 +118,7 @@ export function DashboardScreen() {
         };
       });
   } else {
-    columns = [
-      { key: "equipo", header: "Equipo" },
-      { key: "serial", header: "Serial" },
-      { key: "tipo", header: "Tipo" },
-      { key: "motivo", header: "Motivo" },
-      { key: "tecnico", header: "Técnico" },
-      { key: "estado", header: "Estado" },
-      { key: "fecha", header: "Fecha" },
-    ];
+    columns = incidentColumns;
     rows = data.incidents
       .filter((incident) => {
         const equipment = equipmentById.get(incident.equipment_id);
@@ -134,16 +127,7 @@ export function DashboardScreen() {
           .toLowerCase()
           .includes(term);
       })
-      .map((incident) => ({
-        id: String(incident.id),
-        equipo: equipmentLabel(equipmentById.get(incident.equipment_id), incident.equipment_id),
-        serial: equipmentById.get(incident.equipment_id)?.serial ?? "",
-        tipo: incident.type,
-        motivo: incident.reason,
-        tecnico: operatorLabel(operatorById.get(incident.technician_id), incident.technician_id),
-        estado: incident.status === "open" ? "Abierta" : "Cerrada",
-        fecha: formatDate(incident.created_at),
-      }));
+      .map((incident) => incidentRow(incident, { equipmentById, operatorById }));
   }
 
   const selectedRows = rows.filter((row) => selectedIds.includes(row.id));

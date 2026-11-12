@@ -4,6 +4,7 @@ import { Button, Popup, Sidebar, type SidebarItem } from "./eq-ui";
 import { api, configureApi } from "./api/client";
 import { errorMessage } from "./hooks";
 import { contrastColor, displayName } from "./lib/format";
+import { roleFromToken } from "./lib/auth";
 import {
   getAuthToken,
   getStored,
@@ -21,6 +22,7 @@ import { AssignmentsScreen } from "./screens/Assignments";
 import { LoginScreen } from "./screens/Login";
 import { OperatorsScreen } from "./screens/Operators";
 import { SettingsScreen } from "./screens/Settings";
+import { UsersScreen } from "./screens/Users";
 import { Loading } from "./components/Feedback";
 import { Overlay } from "./components/Overlay";
 
@@ -30,12 +32,14 @@ type PageId =
   | "equipos"
   | "asignaciones"
   | "incidencias"
-  | "ajustes";
+  | "ajustes"
+  | "usuarios";
 
 export function App() {
   const [booting, setBooting] = useState(true);
   const [baseUrl, setBaseUrl] = useState<string | null>(null);
   const [token, setToken] = useState<string | null>(null);
+  const [role, setRole] = useState<string>("staff");
   const [email, setEmail] = useState("");
   const [companyName, setCompanyName] = useState("");
   const [accent, setAccent] = useState("#0588f0");
@@ -63,6 +67,7 @@ export function App() {
       configureApi({ baseUrl: storedUrl ?? "", token: storedToken });
       setBaseUrl(storedUrl);
       setToken(storedToken);
+      setRole(roleFromToken(storedToken));
       setEmail(storedEmail ?? "");
       if (storedPage) setPage(storedPage as PageId);
       setCompanyName(storedCompany ?? "");
@@ -112,6 +117,7 @@ export function App() {
     await setStored("email", nextEmail);
     configureApi({ token: nextToken });
     setToken(nextToken);
+    setRole(roleFromToken(nextToken));
     setEmail(nextEmail);
   }
 
@@ -121,6 +127,7 @@ export function App() {
     await removeStored("page");
     configureApi({ token: null });
     setToken(null);
+    setRole("staff");
     setEmail("");
     setPage("dashboard");
   }
@@ -169,6 +176,8 @@ export function App() {
   else if (page === "equipos") screen = <EquipmentScreen />;
   else if (page === "asignaciones") screen = <AssignmentsScreen />;
   else if (page === "incidencias") screen = <IncidentsScreen />;
+  else if (page === "usuarios" && role === "admin") screen = <UsersScreen />;
+  else if (page === "usuarios") setPage("dashboard");
   else if (page === "ajustes")
     screen = (
       <SettingsScreen
@@ -204,6 +213,7 @@ export function App() {
         items={items}
         onNavigate={(id) => setPage(id as PageId)}
         onUserClick={() => setPage("ajustes")}
+        onWorkspaceClick={role === "admin" ? () => setPage("usuarios") : undefined}
       />
       <main className="flex-1 overflow-y-auto p-8">{screen}</main>
     </div>
