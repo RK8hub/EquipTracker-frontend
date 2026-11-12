@@ -112,15 +112,20 @@ export function DataTable({
                   />
                 </div>
               )}
-              {columns.map((column) => (
-                <div
-                  key={column.key}
-                  role="cell"
-                  className={cn("eq-data-table__cell", column.className)}
-                >
-                  {row[column.key]}
-                </div>
-              ))}
+              {columns.map((column) => {
+                const value = row[column.key];
+                const title = typeof value === "string" ? value : undefined;
+                return (
+                  <div
+                    key={column.key}
+                    role="cell"
+                    title={title}
+                    className={cn("eq-data-table__cell", column.className)}
+                  >
+                    {value}
+                  </div>
+                );
+              })}
             </div>
           ))}
 

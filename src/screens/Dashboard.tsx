@@ -1,10 +1,12 @@
 import { Monitor, Users, Wrench,FileSpreadsheet } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, DataTable, DropdownButton, Header, InfoCard, type DataTableColumn, type DataTableRow } from "../eq-ui";
 import { api } from "../api/client";
 import { errorMessage, useAsync } from "../hooks";
 import { formatDate, operatorLabel, equipmentLabel } from "../lib/format";
 import { exportToCsv } from "../lib/csv";
+import { toMap } from "../lib/lookups";
+import { assignmentColumns, assignmentRow } from "../tables/assignments";
 import { ErrorState, Loading } from "../components/Feedback";
 import { Page } from "../components/Page";
 import type { Operator, Specs } from "../types";
@@ -20,34 +22,34 @@ const viewLabels: Record<View, string> = {
 
 export function DashboardScreen() {
   const { data, loading, error, reload } = useAsync(async () => {
-    const [operators, equipment, assignments, incidents, specs] = await Promise.all([
+    const [operators, equipment, assignments, incidents, specs, users] = await Promise.all([
       api.operators.list(0, 1000),
       api.equipment.list(0, 1000),
       api.assignments.list(0, 1000),
       api.incidents.list(0, 1000),
       api.specs.list(0, 1000),
+      api.users.list().catch(() => []),
     ]);
-    return { operators, equipment, assignments, incidents, specs };
+    return { operators, equipment, assignments, incidents, specs, users };
   }, []);
 
   const [view, setView] = useState<View>("assignments");
   const [search, setSearch] = useState("");
   const [open, setOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [page, setPage] = useState(0);
+  useEffect(() => {
+    setPage(0);
+  }, [view, search]);
 
   if (loading && !data) return <Loading />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
   if (!data) return null;
 
-  const operatorById = new Map<number, Operator>(
-    data.operators.map((operator) => [operator.id, operator]),
-  );
-  const equipmentById = new Map(
-    data.equipment.map((item) => [item.id, item]),
-  );
-  const specsById = new Map<number, Specs>(
-    data.specs.map((spec) => [spec.id, spec]),
-  );
+  const operatorById = toMap(data.operators);
+  const equipmentById = toMap(data.equipment);
+  const specsById = toMap(data.specs);
+  const userById = toMap(data.users ?? []);
 
   const term = search.trim().toLowerCase();
 
@@ -55,14 +57,7 @@ export function DashboardScreen() {
   let rows: DataTableRow[] = [];
 
   if (view === "assignments") {
-    columns = [
-      { key: "equipo", header: "Equipo" },
-      { key: "serial", header: "Serial" },
-      { key: "operador", header: "Operador" },
-      { key: "asignador", header: "Asignador" },
-      { key: "estado", header: "Estado" },
-      { key: "fecha", header: "Fecha" },
-    ];
+    columns = assignmentColumns;
     rows = data.assignments
       .filter((assignment) => {
         const equipment = equipmentById.get(assignment.equipment_id);
@@ -71,15 +66,9 @@ export function DashboardScreen() {
           .toLowerCase()
           .includes(term);
       })
-      .map((assignment) => ({
-        id: String(assignment.id),
-        equipo: equipmentLabel(equipmentById.get(assignment.equipment_id), assignment.equipment_id),
-        serial: equipmentById.get(assignment.equipment_id)?.serial ?? "",
-        operador: operatorLabel(operatorById.get(assignment.operator_id), assignment.operator_id),
-        asignador: operatorLabel(operatorById.get(assignment.assigned_by), assignment.assigned_by),
-        estado: assignment.status === "active" ? "Activo" : "Devuelto",
-        fecha: formatDate(assignment.assigned_at),
-      }));
+      .map((assignment) =>
+        assignmentRow(assignment, { equipmentById, operatorById, userById }),
+      );
   } else if (view === "operators") {
     columns = [
       { key: "nombre", header: "Nombre" },
@@ -159,6 +148,11 @@ export function DashboardScreen() {
 
   const selectedRows = rows.filter((row) => selectedIds.includes(row.id));
 
+  const pageSize = 5;
+  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageRows = rows.slice(safePage * pageSize, (safePage + 1) * pageSize);
+
   function exportCsv() {
     if (selectedRows.length === 0) return;
     exportToCsv(selectedRows, columns, `${view}.csv`);
@@ -189,9 +183,11 @@ export function DashboardScreen() {
 
       <DataTable
         columns={columns}
-        rows={rows}
+        rows={pageRows}
         selectable
         selectedIds={selectedIds}
+        onPrevious={() => setPage((value) => Math.max(value - 1, 0))}
+        onNext={() => setPage((value) => Math.min(value + 1, totalPages - 1))}
         onSelectedChange={setSelectedIds}
         toolbar={
           <Header

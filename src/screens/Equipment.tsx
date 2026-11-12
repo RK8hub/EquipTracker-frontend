@@ -3,13 +3,14 @@ import { toast } from "sonner";
 import {
   Button,
   CardEquipment,
-  DropdownButton,
   Header,
   Popup,
   Textfield,
 } from "../eq-ui";
+import { SortDropdown } from "../components/SortDropdown";
 import { api } from "../api/client";
-import { errorMessage, useAsync } from "../hooks";
+import { errorMessage, useAsync, useSort } from "../hooks";
+import { toMap } from "../lib/lookups";
 import { ErrorState, Loading } from "../components/Feedback";
 import { ModalCard } from "../components/ModalCard";
 import { Overlay } from "../components/Overlay";
@@ -51,8 +52,7 @@ export function EquipmentScreen() {
   }, []);
 
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"modelo" | "serial" | "operador" | "estado">("modelo");
-  const [sortOpen, setSortOpen] = useState(false);
+  const { sortBy, sortOpen, select: selectSort, toggle: toggleSort } = useSort<"modelo" | "serial" | "operador" | "estado">("modelo");
   const [selected, setSelected] = useState<string[]>([]);
   const [form, setForm] = useState<EquipmentForm | null>(null);
   const [specsOpen, setSpecsOpen] = useState(false);
@@ -63,9 +63,7 @@ export function EquipmentScreen() {
   if (error) return <ErrorState message={error} onRetry={reload} />;
   if (!data) return null;
 
-  const operatorById = new Map(
-    data.operators.map((operator) => [operator.id, operator]),
-  );
+  const operatorById = toMap(data.operators);
   const activeAssignmentByEquipment = new Map(
     data.assignments
       .filter((assignment) => assignment.status === "active")
@@ -205,42 +203,18 @@ export function EquipmentScreen() {
         }}
         right={
           <div className="relative">
-            <DropdownButton
-              label={
-                sortBy === "modelo"
-                  ? "Modelo"
-                  : sortBy === "serial"
-                    ? "Serial"
-                    : sortBy === "operador"
-                      ? "Operador"
-                      : "Estado"
-              }
-              title="Ordenar por este criterio"
+            <SortDropdown
+              options={[
+                { value: "modelo", label: "Modelo" },
+                { value: "serial", label: "Serial" },
+                { value: "operador", label: "Operador" },
+                { value: "estado", label: "Estado" },
+              ]}
+              value={sortBy}
               open={sortOpen}
-              onClick={() => setSortOpen((value) => !value)}
+              onToggle={toggleSort}
+              onSelect={selectSort}
             />
-            {sortOpen && (
-              <div className="absolute right-0 top-11.5 z-10 w-40 rounded-[8px] border border-stroke bg-object p-1 shadow-lg">
-                {[
-                  { value: "modelo", label: "Modelo" },
-                  { value: "serial", label: "Serial" },
-                  { value: "operador", label: "Operador" },
-                  { value: "estado", label: "Estado" },
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    className="flex w-full cursor-pointer rounded-md px-3 py-2 text-left text-sm text-primary transition-colors hover:bg-border/60"
-                    onClick={() => {
-                      setSortBy(option.value as "modelo" | "serial" | "operador" | "estado");
-                      setSortOpen(false);
-                    }}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
         }
       />

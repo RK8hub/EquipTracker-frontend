@@ -1,8 +1,9 @@
 import { useState, type FormEvent } from "react";
 import { toast } from "sonner";
-import { CardOperador, DropdownButton, Header, ModalOperator, Popup } from "../eq-ui";
+import { CardOperador, Header, ModalOperator, Popup } from "../eq-ui";
+import { SortDropdown } from "../components/SortDropdown";
 import { api } from "../api/client";
-import { errorMessage, useAsync } from "../hooks";
+import { errorMessage, useAsync, useSort } from "../hooks";
 import { initials } from "../lib/format";
 import { ErrorState, Loading } from "../components/Feedback";
 import { Overlay } from "../components/Overlay";
@@ -28,8 +29,7 @@ export function OperatorsScreen() {
   }, []);
 
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"name" | "department" | "position">("name");
-  const [sortOpen, setSortOpen] = useState(false);
+  const { sortBy, sortOpen, select: selectSort, toggle: toggleSort } = useSort<"name" | "department" | "position">("name");
   const [selected, setSelected] = useState<string[]>([]);
   const [form, setForm] = useState<OperatorForm | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -150,38 +150,17 @@ export function OperatorsScreen() {
         }}
         right={
           <div className="relative">
-            <DropdownButton
-              label={
-                sortBy === "name"
-                  ? "Nombre"
-                  : sortBy === "department"
-                    ? "Departamento"
-                    : "Puesto"
-              }
-              title="Ordenar por este criterio (no filtra)" open={sortOpen}
-              onClick={() => setSortOpen((value) => !value)}
+            <SortDropdown
+              options={[
+                { value: "name", label: "Nombre" },
+                { value: "department", label: "Departamento" },
+                { value: "position", label: "Puesto" },
+              ]}
+              value={sortBy}
+              open={sortOpen}
+              onToggle={toggleSort}
+              onSelect={selectSort}
             />
-            {sortOpen && (
-              <div className="absolute right-0 top-[46px] z-10 w-40 rounded-[8px] border border-stroke bg-object p-1 shadow-lg">
-                {[
-                  { value: "name", label: "Nombre" },
-                  { value: "department", label: "Departamento" },
-                  { value: "position", label: "Puesto" },
-                ].map((option) => (
-                  <button
-                    key={option.value}
-                    type="button"
-                    className="flex w-full cursor-pointer rounded-[6px] px-3 py-2 text-left text-sm text-primary transition-colors hover:bg-border/60"
-                    onClick={() => {
-                      setSortBy(option.value as "name" | "department" | "position");
-                      setSortOpen(false);
-                    }}
-                  >
-                    {option.label}
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
         }
       />

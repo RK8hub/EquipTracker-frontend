@@ -1,9 +1,12 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button, DataTable, DropdownButton, Header, type DataTableColumn, type DataTableRow } from "../eq-ui";
+import { Button, DataTable, Header, type DataTableColumn, type DataTableRow } from "../eq-ui";
+import { SortDropdown } from "../components/SortDropdown";
+import { assignmentColumns, assignmentRow } from "../tables/assignments";
 import { api } from "../api/client";
-import { errorMessage, useAsync } from "../hooks";
-import { equipmentLabel, formatDate, operatorLabel } from "../lib/format";
+import { errorMessage, useAsync, useSort } from "../hooks";
+import { displayName, equipmentLabel, formatDate, operatorLabel } from "../lib/format";
+import { toMap } from "../lib/lookups";
 import { ErrorState, Loading } from "../components/Feedback";
 import { ModalCard } from "../components/ModalCard";
 import { Page } from "../components/Page";
@@ -38,8 +41,8 @@ export function AssignmentsScreen() {
   }, []);
 
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"equipo" | "operador" | "estado" | "fecha">("fecha");
-  const [sortOpen, setSortOpen] = useState(false);
+  const { sortBy, sortOpen, select: selectSort, toggle: toggleSort } = useSort<"equipo" | "operador" | "estado" | "fecha">("fecha");
+  const [page, setPage] = useState(0);
   const [form, setForm] = useState<AssignmentForm | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -47,9 +50,9 @@ export function AssignmentsScreen() {
   if (error) return <ErrorState message={error} onRetry={reload} />;
   if (!data) return null;
 
-  const equipmentById = new Map(data.equipment.map((item) => [item.id, item]));
-  const operatorById = new Map(data.operators.map((item) => [item.id, item]));
-  const userById = new Map(data.users.map((item) => [item.id, item]));
+  const equipmentById = toMap(data.equipment);
+  const operatorById = toMap(data.operators);
+  const userById = toMap(data.users);
 
   const assignedEquipmentIds = new Set(
     data.assignments
@@ -88,28 +91,12 @@ export function AssignmentsScreen() {
     });
 
   const columns: DataTableColumn[] = [
-    { key: "equipo", header: "Equipo" },
-    { key: "serial", header: "Serial" },
-    { key: "operador", header: "Operador" },
-    { key: "asignador", header: "Asignador" },
-    { key: "estado", header: "Estado" },
-    { key: "fecha", header: "Fecha" },
+    ...assignmentColumns,
     { key: "accion", header: "Acción", className: "justify-center" },
   ];
 
   const rows: DataTableRow[] = visible.map((assignment) => ({
-    id: String(assignment.id),
-    equipo: equipmentLabel(equipmentById.get(assignment.equipment_id), assignment.equipment_id),
-    serial: equipmentById.get(assignment.equipment_id)?.serial ?? "",
-    operador: operatorLabel(operatorById.get(assignment.operator_id), assignment.operator_id),
-    asignador:
-      (userById.get(assignment.assigned_by)?.email ?? "")
-        .split("@")[0]
-        .split(".")
-        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(" ") || `Usuario #${assignment.assigned_by}`,
-    estado: assignment.status === "active" ? "Activo" : "Devuelto",
-    fecha: formatDate(assignment.assigned_at),
+    ...assignmentRow(assignment, { equipmentById, operatorById, userById }),
     accion:
       assignment.status === "active" ? (
         <Button
@@ -123,6 +110,11 @@ export function AssignmentsScreen() {
         "—"
       ),
   }));
+
+  const pageSize = 5;
+  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageRows = rows.slice(safePage * pageSize, (safePage + 1) * pageSize);
 
   async function save() {
     if (!form || busy) return;
@@ -177,8 +169,10 @@ export function AssignmentsScreen() {
     <Page title="Asignaciones" subtitle="Equipos entregados y su historial de devolución.">
       <DataTable
         columns={columns}
-        rows={rows}
+        rows={pageRows}
         selectable={false}
+        onPrevious={() => setPage((value) => Math.max(value - 1, 0))}
+        onNext={() => setPage((value) => Math.min(value + 1, totalPages - 1))}
         toolbar={
           <Header
             variant="crud"
@@ -193,46 +187,23 @@ export function AssignmentsScreen() {
             }}
             right={
               <div className="relative">
-                <DropdownButton
-                  label={
-                    sortBy === "equipo"
-                      ? "Equipo"
-                      : sortBy === "operador"
-                        ? "Operador"
-                        : sortBy === "estado"
-                          ? "Estado"
-                          : "Fecha"
-                  }
-                  title="Ordenar por este criterio (no filtra)" open={sortOpen}
-                  onClick={() => setSortOpen((value) => !value)}
+                <SortDropdown
+                  options={[
+                    { value: "equipo", label: "Equipo" },
+                    { value: "operador", label: "Operador" },
+                    { value: "estado", label: "Estado" },
+                    { value: "fecha", label: "Fecha" },
+                  ]}
+                  value={sortBy}
+                  open={sortOpen}
+                  onToggle={toggleSort}
+                  onSelect={selectSort}
                 />
-                {sortOpen && (
-                  <div className="absolute right-0 top-[46px] z-10 w-40 rounded-[8px] border border-stroke bg-object p-1 shadow-lg">
-                    {[
-                      { value: "equipo", label: "Equipo" },
-                      { value: "operador", label: "Operador" },
-                      { value: "estado", label: "Estado" },
-                      { value: "fecha", label: "Fecha" },
-                    ].map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        className="flex w-full cursor-pointer rounded-[6px] px-3 py-2 text-left text-sm text-primary transition-colors hover:bg-border/60"
-                        onClick={() => {
-                          setSortBy(option.value as "equipo" | "operador" | "estado" | "fecha");
-                          setSortOpen(false);
-                        }}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
             }
           />
         }
-        summary={`${rows.length} asignaciones`}
+        summary={`${rows.length} asignaciones · pág. ${safePage + 1}/${totalPages}`}
       />
 
       {form && (
@@ -287,12 +258,7 @@ export function AssignmentsScreen() {
             }
             options={data.users.map((user) => ({
               value: String(user.id),
-              label:
-                user.email
-                  .split("@")[0]
-                  .split(".")
-                  .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-                  .join(" ") || user.email,
+              label: displayName(user.email),
             }))}
             placeholder={
               data.users.length === 0

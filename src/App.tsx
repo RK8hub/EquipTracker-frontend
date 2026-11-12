@@ -3,7 +3,7 @@ import { toast } from "sonner";
 import { Button, Popup, Sidebar, type SidebarItem } from "./eq-ui";
 import { api, configureApi } from "./api/client";
 import { errorMessage } from "./hooks";
-import { contrastColor } from "./lib/format";
+import { contrastColor, displayName } from "./lib/format";
 import {
   getAuthToken,
   getStored,
@@ -198,11 +198,7 @@ export function App() {
           company: companyName || email.split("@")[1] || baseUrl || "",
         }}
         user={{
-          name:
-            (email.split("@")[0] || "Usuario")
-              .split(".")
-              .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-              .join(" ") || "Usuario",
+          name: displayName(email) || "Usuario",
           email,
         }}
         items={items}

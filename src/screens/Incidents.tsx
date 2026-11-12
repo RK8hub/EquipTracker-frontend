@@ -1,9 +1,11 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { Button, DataTable, DropdownButton, Header, type DataTableColumn, type DataTableRow } from "../eq-ui";
+import { Button, DataTable, Header, type DataTableColumn, type DataTableRow } from "../eq-ui";
+import { SortDropdown } from "../components/SortDropdown";
 import { api } from "../api/client";
-import { errorMessage, useAsync } from "../hooks";
+import { errorMessage, useAsync, useSort } from "../hooks";
 import { equipmentLabel, formatDate, operatorLabel } from "../lib/format";
+import { toMap } from "../lib/lookups";
 import { ErrorState, Loading } from "../components/Feedback";
 import { ModalCard } from "../components/ModalCard";
 import { Page } from "../components/Page";
@@ -37,8 +39,8 @@ export function IncidentsScreen() {
   }, []);
 
   const [search, setSearch] = useState("");
-  const [sortBy, setSortBy] = useState<"equipo" | "tipo" | "tecnico" | "estado" | "fecha">("fecha");
-  const [sortOpen, setSortOpen] = useState(false);
+  const { sortBy, sortOpen, select: selectSort, toggle: toggleSort } = useSort<"equipo" | "tipo" | "tecnico" | "estado" | "fecha">("fecha");
+  const [page, setPage] = useState(0);
   const [form, setForm] = useState<IncidentForm | null>(null);
   const [busy, setBusy] = useState(false);
 
@@ -46,8 +48,8 @@ export function IncidentsScreen() {
   if (error) return <ErrorState message={error} onRetry={reload} />;
   if (!data) return null;
 
-  const equipmentById = new Map(data.equipment.map((item) => [item.id, item]));
-  const operatorById = new Map(data.operators.map((item) => [item.id, item]));
+  const equipmentById = toMap(data.equipment);
+  const operatorById = toMap(data.operators);
 
   const term = search.trim().toLowerCase();
   const visible = data.incidents
@@ -116,6 +118,11 @@ export function IncidentsScreen() {
       ),
   }));
 
+  const pageSize = 5;
+  const totalPages = Math.max(1, Math.ceil(rows.length / pageSize));
+  const safePage = Math.min(page, totalPages - 1);
+  const pageRows = rows.slice(safePage * pageSize, (safePage + 1) * pageSize);
+
   const operatorOptions = data.operators.map((operator) => ({
     value: String(operator.id),
     label: operator.name,
@@ -171,8 +178,10 @@ export function IncidentsScreen() {
     <Page title="Incidencias" subtitle="Reportes de fallas y su seguimiento hasta el cierre.">
       <DataTable
         columns={columns}
-        rows={rows}
+        rows={pageRows}
         selectable={false}
+        onPrevious={() => setPage((value) => Math.max(value - 1, 0))}
+        onNext={() => setPage((value) => Math.min(value + 1, totalPages - 1))}
         toolbar={
           <Header
             variant="crud"
@@ -187,49 +196,24 @@ export function IncidentsScreen() {
             }}
             right={
               <div className="relative">
-                <DropdownButton
-                  label={
-                    sortBy === "equipo"
-                      ? "Equipo"
-                      : sortBy === "tipo"
-                        ? "Tipo"
-                        : sortBy === "tecnico"
-                          ? "Técnico"
-                          : sortBy === "estado"
-                            ? "Estado"
-                            : "Fecha"
-                  }
-                  title="Ordenar por este criterio (no filtra)" open={sortOpen}
-                  onClick={() => setSortOpen((value) => !value)}
+                <SortDropdown
+                  options={[
+                    { value: "equipo", label: "Equipo" },
+                    { value: "tipo", label: "Tipo" },
+                    { value: "tecnico", label: "Técnico" },
+                    { value: "estado", label: "Estado" },
+                    { value: "fecha", label: "Fecha" },
+                  ]}
+                  value={sortBy}
+                  open={sortOpen}
+                  onToggle={toggleSort}
+                  onSelect={selectSort}
                 />
-                {sortOpen && (
-                  <div className="absolute right-0 top-[46px] z-10 w-40 rounded-[8px] border border-stroke bg-object p-1 shadow-lg">
-                    {[
-                      { value: "equipo", label: "Equipo" },
-                      { value: "tipo", label: "Tipo" },
-                      { value: "tecnico", label: "Técnico" },
-                      { value: "estado", label: "Estado" },
-                      { value: "fecha", label: "Fecha" },
-                    ].map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        className="flex w-full cursor-pointer rounded-[6px] px-3 py-2 text-left text-sm text-primary transition-colors hover:bg-border/60"
-                        onClick={() => {
-                          setSortBy(option.value as "equipo" | "tipo" | "tecnico" | "estado" | "fecha");
-                          setSortOpen(false);
-                        }}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
               </div>
             }
           />
         }
-        summary={`${rows.length} incidencias`}
+        summary={`${rows.length} incidencias · pág. ${safePage + 1}/${totalPages}`}
       />
 
       {form && (

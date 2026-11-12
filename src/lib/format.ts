@@ -31,6 +31,15 @@ export function operatorLabel(
   return operator?.name ?? `Operador #${id}`;
 }
 
+export function displayName(email: string): string {
+  return (
+    (email.split("@")[0] || "")
+      .split(".")
+      .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+      .join(" ") || email
+  );
+}
+
 export function contrastColor(hex: string): string {
   const clean = hex.replace("#", "");
   if (clean.length !== 6) return "#ffffff";
