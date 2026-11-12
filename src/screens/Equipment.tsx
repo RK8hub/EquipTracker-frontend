@@ -82,11 +82,17 @@ export function EquipmentScreen() {
 
   const term = search.trim().toLowerCase();
   const filtered = data.equipment
-    .filter((equipment) =>
-      `${equipment.serial} ${equipment.brand} ${equipment.model}`
+    .filter((equipment) => {
+      const assignment = data.assignments.find(
+        (item) => item.equipment_id === equipment.id && item.status === "active",
+      );
+      const operator = assignment
+        ? data.operators.find((item) => item.id === assignment.operator_id)
+        : undefined;
+      return `${equipment.serial} ${equipment.brand} ${equipment.model} ${operator?.name ?? ""}`
         .toLowerCase()
-        .includes(term),
-    )
+        .includes(term);
+    })
     .sort((a, b) => {
       const operatorName = (equipmentId: number) => {
         const assignment = data.assignments.find(
