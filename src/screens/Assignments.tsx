@@ -100,7 +100,12 @@ export function AssignmentsScreen() {
     id: String(assignment.id),
     equipo: equipmentLabel(equipmentById.get(assignment.equipment_id), assignment.equipment_id),
     operador: operatorLabel(operatorById.get(assignment.operator_id), assignment.operator_id),
-    asignador: userById.get(assignment.assigned_by)?.email ?? `Usuario #${assignment.assigned_by}`,
+    asignador:
+      (userById.get(assignment.assigned_by)?.email ?? "")
+        .split("@")[0]
+        .split(".")
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ") || `Usuario #${assignment.assigned_by}`,
     estado: assignment.status === "active" ? "Activo" : "Devuelto",
     fecha: formatDate(assignment.assigned_at),
     accion:
@@ -280,7 +285,12 @@ export function AssignmentsScreen() {
             }
             options={data.users.map((user) => ({
               value: String(user.id),
-              label: user.email,
+              label:
+                user.email
+                  .split("@")[0]
+                  .split(".")
+                  .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+                  .join(" ") || user.email,
             }))}
             placeholder={
               data.users.length === 0
