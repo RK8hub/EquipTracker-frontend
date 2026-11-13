@@ -52,7 +52,7 @@ export function EquipmentScreen() {
   }, []);
 
   const [search, setSearch] = useState("");
-  const { sortBy, sortOpen, select: selectSort, toggle: toggleSort } = useSort<"modelo" | "serial" | "operador" | "estado">("modelo");
+  const { sortBy, sortOpen, select: selectSort, toggle: toggleSort } = useSort<"modelo" | "serial" | "operador" | "estado" | "incidencias">("modelo");
   const [selected, setSelected] = useState<string[]>([]);
   const [form, setForm] = useState<EquipmentForm | null>(null);
   const [specsOpen, setSpecsOpen] = useState(false);
@@ -114,7 +114,9 @@ export function EquipmentScreen() {
             ? a.serial
             : sortBy === "operador"
               ? operatorName(a.id)
-              : isAssigned(a.id);
+              : sortBy === "incidencias"
+                ? (openIncidentsByEquipment.get(a.id) ?? 0)
+                : isAssigned(a.id);
       const bv =
         sortBy === "modelo"
           ? `${b.brand} ${b.model}`
@@ -122,7 +124,12 @@ export function EquipmentScreen() {
             ? b.serial
             : sortBy === "operador"
               ? operatorName(b.id)
-              : isAssigned(b.id);
+              : sortBy === "incidencias"
+                ? (openIncidentsByEquipment.get(b.id) ?? 0)
+                : isAssigned(b.id);
+      if (sortBy === "estado" || sortBy === "incidencias") {
+        return (av as number) - (bv as number);
+      }
       return String(av).localeCompare(String(bv), "es", { sensitivity: "base" });
     });
 
@@ -209,6 +216,7 @@ export function EquipmentScreen() {
                 { value: "serial", label: "Serial" },
                 { value: "operador", label: "Operador" },
                 { value: "estado", label: "Estado" },
+                { value: "incidencias", label: "Incidencias" },
               ]}
               value={sortBy}
               open={sortOpen}
