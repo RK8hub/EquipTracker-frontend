@@ -41,7 +41,7 @@ export function AssignmentsScreen() {
   }, []);
 
   const [search, setSearch] = useState("");
-  const { sortBy, sortOpen, select: selectSort, toggle: toggleSort } = useSort<"equipo" | "operador" | "estado" | "fecha">("fecha");
+  const { sortBy, sortOpen, select: selectSort, toggle: toggleSort } = useSort<"equipo" | "operador" | "estado" | "fecha" | "asignador">("fecha");
   const [page, setPage] = useState(0);
   const [form, setForm] = useState<AssignmentForm | null>(null);
   const [busy, setBusy] = useState(false);
@@ -81,17 +81,21 @@ export function AssignmentsScreen() {
           ? equipmentLabel(equipmentById.get(a.equipment_id), a.equipment_id)
           : sortBy === "operador"
             ? operatorLabel(operatorById.get(a.operator_id), a.operator_id)
-            : sortBy === "estado"
-              ? a.status
-              : a.assigned_at;
+            : sortBy === "asignador"
+              ? (userById.get(a.assigned_by) ? displayName(userById.get(a.assigned_by)!.email) : `Usuario #${a.assigned_by}`)
+              : sortBy === "estado"
+                ? a.status
+                : a.assigned_at;
       const bv =
         sortBy === "equipo"
           ? equipmentLabel(equipmentById.get(b.equipment_id), b.equipment_id)
           : sortBy === "operador"
             ? operatorLabel(operatorById.get(b.operator_id), b.operator_id)
-            : sortBy === "estado"
-              ? b.status
-              : b.assigned_at;
+            : sortBy === "asignador"
+              ? (userById.get(b.assigned_by) ? displayName(userById.get(b.assigned_by)!.email) : `Usuario #${b.assigned_by}`)
+              : sortBy === "estado"
+                ? b.status
+                : b.assigned_at;
       return String(av).localeCompare(String(bv), "es", { sensitivity: "base" });
     });
 
@@ -209,6 +213,7 @@ export function AssignmentsScreen() {
                   options={[
                     { value: "equipo", label: "Equipo" },
                     { value: "operador", label: "Operador" },
+                    { value: "asignador", label: "Asignador" },
                     { value: "estado", label: "Estado" },
                     { value: "fecha", label: "Fecha" },
                   ]}
