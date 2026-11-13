@@ -1,0 +1,35 @@
+AVISOS DE TERCEROS — EquipTracker
+
+Este producto incluye o depende de los siguientes componentes de terceros.
+Cada uno se rige por su propia licencia; este aviso no modifica sus términos.
+
+Dependencias de ejecución
+-------------------------
+React, React DOM ........ MIT ........ Copyright (c) Meta Platforms, Inc.
+lucide-react ............ ISC ........ Copyright (c) Lucide Contributors
+sonner .................. MIT ........ Copyright (c) Emil Kowalski
+clsx .................... MIT ........ Copyright (c) Luke Edwards
+tailwind-merge .......... MIT ........ Copyright (c) Dcastil
+@tauri-apps/api ......... Apache-2.0 OR MIT
+@tauri-apps/plugin-http . MIT OR Apache-2.0
+@tauri-apps/plugin-store  MIT OR Apache-2.0
+   Copyright (c) Tauri Programme within The Commons Conservancy
+
+Tipografía
+----------
+Inter (via @fontsource/inter) ... SIL Open Font License 1.1
+   Copyright (c) The Inter Project Authors (https://github.com/rsms/inter)
+   Se distribuye bajo OFL-1.1; la fuente no se vende por separado.
+
+Herramientas de desarrollo (no se incluyen en el binario distribuido)
+---------------------------------------------------------------------
+Vite .................... MIT
+TypeScript .............. Apache-2.0
+Tailwind CSS ............ MIT
+@tailwindcss/vite ....... MIT
+@vitejs/plugin-react .... MIT
+
+Los textos completos de cada licencia están en node_modules/<paquete>/LICENSE
+y en los repositorios oficiales de cada proyecto.
+
+Última actualización: 13 de noviembre de 2026.
