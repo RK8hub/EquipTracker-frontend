@@ -2,42 +2,78 @@
 
 @custom-variant dark (&:where(.dark, .dark *));
 
-/*
- * Tokens de la colección "Equiptracker" (Claro / Oscuro).
- * Los dos tokens que chocaban como "primary" quedan separados:
- *   primary -> texto principal del diseño
- *   strong  -> segundo valor que el archivo definía también como primary
- *
- * Tema claro: fondo gris azulado con tarjetas blancas "flotando" para
- * replicar la profundidad del tema oscuro. Neutros con tinte frío (~215°).
- */
 :root {
-  --eq-background: #eceef2;
-  --eq-foreground: #0b0f14;
-  --eq-card: #ffffff;
-  --eq-card-inverse: #171c24;
+  /* Modo Claro (fijo): paleta neutral derivada de #212121 */
+  --eq-background: #FAFAFA;
+  --eq-page: #F3F3F3;
+  --eq-card: #FFFFFF;
+  --eq-card-inverse: #212121;
   --eq-card-inverse-foreground: #f6f7f9;
-  --eq-object: #e1e5eb;
-  --eq-primary: #2f3744;
-  --eq-primary-foreground: #f6f7f9;
-  --eq-strong: #171c24;
-  --eq-stroke: #2f3744;
-  --eq-border: #d2d8e0;
-  --eq-muted-foreground: #5b6574;
-  --eq-accent: #0a5fb4;
-  --eq-brand: #0872d8;
-  --eq-brand-foreground: #ffffff;
-  --eq-success: #15803d;
-  --eq-success-foreground: #ffffff;
-  --eq-warning: #b45309;
-  --eq-warning-foreground: #ffffff;
-  --eq-destructive: #d92d20;
-  --eq-destructive-foreground: #ffffff;
-  --eq-avatar: #dfe4ea;
-  --eq-avatar-foreground: #5b6574;
-  --eq-avatar-solid: #171c24;
-  --eq-avatar-icon: #e1e5eb;
-  --eq-page: #dde1e7;
+  --eq-object: #EBEBEB;
+  --eq-foreground: #2E2E2E;
+  --eq-primary: #2E2E2E;
+  --eq-primary-foreground: #FFFFFF;
+  --eq-strong: #1B1B1B;
+  --eq-muted-foreground: #5D5D5D;
+  --eq-stroke: #CCCCCC;
+  --eq-border: #DFDFDF;
+  --eq-accent: #212121;
+  --eq-brand: #212121;
+  --eq-brand-foreground: #FFFFFF;
+  --eq-success: #15803D;
+  --eq-success-foreground: #FFFFFF;
+  --eq-warning: #B45309;
+  --eq-warning-foreground: #FFFFFF;
+  --eq-destructive: #D92D20;
+  --eq-destructive-foreground: #FFFFFF;
+  --eq-avatar: #EBEBEB;
+  --eq-avatar-foreground: #5D5D5D;
+  --eq-avatar-solid: #212121;
+  --eq-avatar-icon: #FFFFFF;
+}
+
+/* Tema claro derivado del acento (tonal palette estilo MUI: tono fijo, tono/saturacion de la semilla) */
+@supports (color: oklch(from #000 0.5 c h)) {
+  /* Dinamico: claro (semilla de alta luminosidad) */
+  [data-theme="dynamic"]:not(.dark) {
+    --eq-background: oklch(from var(--eq-accent) 0.985 calc(c * 0.15) h);
+    --eq-page:       oklch(from var(--eq-accent) 0.965 calc(c * 0.18) h);
+    --eq-card: #FFFFFF;
+    --eq-card-inverse: oklch(from var(--eq-accent) min(l, 0.45) c h);
+    --eq-card-inverse-foreground: #FFFFFF;
+    --eq-object:     oklch(from var(--eq-accent) 0.940 calc(c * 0.25) h);
+    --eq-foreground: oklch(from var(--eq-accent) 0.300 calc(c * 0.40) h);
+    --eq-primary: var(--eq-foreground);
+    --eq-primary-foreground: #FFFFFF;
+    --eq-strong: oklch(from var(--eq-accent) 0.220 calc(c * 0.40) h);
+    --eq-muted-foreground: oklch(from var(--eq-accent) 0.480 calc(c * 0.50) h);
+    --eq-stroke: oklch(from var(--eq-accent) 0.845 calc(c * 0.35) h);
+    --eq-border: oklch(from var(--eq-accent) 0.905 calc(c * 0.30) h);
+    --eq-avatar: oklch(from var(--eq-accent) 0.940 calc(c * 0.25) h);
+    --eq-avatar-foreground: var(--eq-foreground);
+    --eq-avatar-solid: oklch(from var(--eq-accent) min(l, 0.45) c h);
+    --eq-avatar-icon: #FFFFFF;
+  }
+  /* Dinamico: oscuro (semilla de baja luminosidad) */
+  [data-theme="dynamic"].dark {
+    --eq-background: oklch(from var(--eq-accent) 0.19 calc(c * 0.25) h);
+    --eq-page:       oklch(from var(--eq-accent) 0.22 calc(c * 0.25) h);
+    --eq-card:       oklch(from var(--eq-accent) 0.25 calc(c * 0.30) h);
+    --eq-card-inverse: oklch(from var(--eq-accent) 0.94 calc(c * 0.15) h);
+    --eq-card-inverse-foreground: oklch(from var(--eq-accent) 0.20 calc(c * 0.20) h);
+    --eq-object:     oklch(from var(--eq-accent) 0.29 calc(c * 0.30) h);
+    --eq-foreground: oklch(from var(--eq-accent) 0.94 calc(c * 0.20) h);
+    --eq-primary: var(--eq-foreground);
+    --eq-primary-foreground: oklch(from var(--eq-accent) 0.20 calc(c * 0.20) h);
+    --eq-strong: oklch(from var(--eq-accent) 0.98 calc(c * 0.15) h);
+    --eq-muted-foreground: oklch(from var(--eq-accent) 0.72 calc(c * 0.35) h);
+    --eq-stroke: oklch(from var(--eq-accent) 0.42 calc(c * 0.35) h);
+    --eq-border: oklch(from var(--eq-accent) 0.33 calc(c * 0.30) h);
+    --eq-avatar: oklch(from var(--eq-accent) 0.29 calc(c * 0.30) h);
+    --eq-avatar-foreground: var(--eq-foreground);
+    --eq-avatar-solid: oklch(from var(--eq-accent) 0.80 c h);
+    --eq-avatar-icon: oklch(from var(--eq-accent) 0.15 calc(c * 0.20) h);
+  }
 }
 
 .dark {
@@ -97,11 +133,10 @@
   --color-avatar-icon: var(--eq-avatar-icon);
   --color-page: var(--eq-page);
 
-  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
-    sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system,
+    "Segoe UI", sans-serif;
 }
 
-/* Radios que usa el archivo */
 @theme {
   --radius-field: 14px;
   --radius-card: 24px;

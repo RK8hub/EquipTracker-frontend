@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
-import { Button, Textfield } from "../eq-ui";
+import { Button, SelectField, Textfield } from "../eq-ui";
 import { checkHealth } from "../api/client";
 import { getStored } from "../lib/storage";
 import { Page } from "../components/Page";
+import { applyTheme, type Theme } from "../lib/theme";
 
 export interface SettingsScreenProps {
   baseUrl: string;
@@ -25,7 +26,7 @@ export function SettingsScreen({
   const [testing, setTesting] = useState(false);
   const [health, setHealth] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
+  const [theme, setTheme] = useState<Theme>("dark");
   const [companyInput, setCompanyInput] = useState(companyName);
   const [savingCompany, setSavingCompany] = useState(false);
   const [accentInput, setAccentInput] = useState(accent);
@@ -41,19 +42,20 @@ export function SettingsScreen({
 
   useEffect(() => {
     (async () => {
-      const stored = await getStored<"dark" | "light">("theme");
+      const stored = await getStored<Theme>("theme");
       const next = stored ?? "dark";
       setTheme(next);
-      document.documentElement.classList.toggle("dark", next === "dark");
+      applyTheme(next, accent);
     })();
   }, []);
 
-  async function toggleTheme() {
-    const next = theme === "dark" ? "light" : "dark";
+  async function changeTheme(next: Theme) {
     setTheme(next);
-    document.documentElement.classList.toggle("dark", next === "dark");
+    applyTheme(next, accent);
     await (await import("../lib/storage")).setStored("theme", next);
-    toast.success(`Tema ${next === "dark" ? "oscuro" : "claro"} activado`);
+    toast.success(
+      `Tema ${next === "dark" ? "oscuro" : next === "light" ? "claro" : "dinámico"} activado`,
+    );
   }
 
   async function testConnection() {
@@ -76,35 +78,43 @@ export function SettingsScreen({
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         <section className="rounded-[24px] border border-stroke bg-card p-6 flex flex-col gap-4">
           <h2 className="text-lg font-semibold">Apariencia</h2>
-          <p className="text-sm text-muted-foreground">
-            Tema actual: {theme === "dark" ? "Oscuro" : "Claro"}
-          </p>
-          <Button
-            text={theme === "dark" ? "Cambiar a claro" : "Cambiar a oscuro"}
-            onClick={toggleTheme}
+          <SelectField
+            label="Tema"
+            value={theme}
+            onChange={(value) => void changeTheme(value as Theme)}
+            options={[
+              { value: "dark", label: "Oscuro" },
+              { value: "light", label: "Claro" },
+              { value: "dynamic", label: "Dinámico" },
+            ]}
           />
+          {theme === "light" && (
+            <p className="text-xs text-muted-foreground">
+              Quien usa tema claro?...
+            </p>
+          )}
           <div className="flex items-center gap-3">
-            <input
-              type="color"
-              value={accentInput}
-              onChange={(event) => setAccentInput(event.target.value)}
-              className="h-[42px] w-[60px] cursor-pointer rounded-[8px] border border-stroke bg-object"
-            />
-            <span className="text-sm text-muted-foreground flex-1">{accentInput}</span>
-            <Button
-              text={savingAccent ? "Aplicando..." : "Aplicar"}
-              disabled={savingAccent}
-              onClick={async () => {
-                setSavingAccent(true);
-                try {
-                  await onAccentChange(accentInput);
-                  toast.success("Color de acento actualizado");
-                } finally {
-                  setSavingAccent(false);
-                }
-              }}
-            />
-          </div>
+              <input
+                type="color"
+                value={accentInput}
+                onChange={(event) => setAccentInput(event.target.value)}
+                className="h-[42px] w-[60px] cursor-pointer rounded-[8px] border border-stroke bg-object"
+              />
+              <span className="text-sm text-muted-foreground flex-1">{accentInput}</span>
+              <Button
+                text={savingAccent ? "Aplicando..." : "Aplicar"}
+                disabled={savingAccent}
+                onClick={async () => {
+                  setSavingAccent(true);
+                  try {
+                    await onAccentChange(accentInput);
+                    toast.success("Color de acento actualizado");
+                  } finally {
+                    setSavingAccent(false);
+                  }
+                }}
+              />
+            </div>
         </section>
 
         <section className="rounded-[24px] border border-stroke bg-card p-6 flex flex-col gap-4">

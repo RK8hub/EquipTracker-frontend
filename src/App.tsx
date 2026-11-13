@@ -3,7 +3,8 @@ import { toast } from "sonner";
 import { Button, Popup, Sidebar, type SidebarItem } from "./eq-ui";
 import { api, configureApi } from "./api/client";
 import { errorMessage } from "./hooks";
-import { contrastColor, displayName } from "./lib/format";
+import { displayName } from "./lib/format";
+import { applyTheme, type Theme } from "./lib/theme";
 import { roleFromToken } from "./lib/auth";
 import {
   getAuthToken,
@@ -71,15 +72,10 @@ export function App() {
       setEmail(storedEmail ?? "");
       if (storedPage) setPage(storedPage as PageId);
       setCompanyName(storedCompany ?? "");
-      const storedTheme = await getStored<"dark" | "light">("theme");
-      document.documentElement.classList.toggle("dark", (storedTheme ?? "dark") === "dark");
+      const storedTheme = ((await getStored<Theme>("theme")) ?? "dark") as Theme;
       const storedAccent = await getStored<string>("accent");
-      if (storedAccent) {
-        setAccent(storedAccent);
-        document.documentElement.style.setProperty("--eq-brand", storedAccent);
-        document.documentElement.style.setProperty("--eq-accent", storedAccent);
-        document.documentElement.style.setProperty("--eq-brand-foreground", contrastColor(storedAccent));
-      }
+      if (storedAccent) setAccent(storedAccent);
+      applyTheme(storedTheme, storedAccent ?? undefined);
       hydrated.current = true;
       setBooting(false);
     })();
@@ -190,9 +186,11 @@ export function App() {
         }}
         onAccentChange={async (value) => {
           await setStored("accent", value);
-          document.documentElement.style.setProperty("--eq-brand", value);
-          document.documentElement.style.setProperty("--eq-accent", value);
-          document.documentElement.style.setProperty("--eq-brand-foreground", contrastColor(value));
+          setAccent(value);
+          applyTheme(
+            (document.documentElement.dataset.theme as Theme) ?? "dark",
+            value,
+          );
         }}
         onLogout={handleLogout}
       />
