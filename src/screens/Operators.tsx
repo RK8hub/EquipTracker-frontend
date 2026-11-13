@@ -29,7 +29,7 @@ export function OperatorsScreen() {
   }, []);
 
   const [search, setSearch] = useState("");
-  const { sortBy, sortOpen, select: selectSort, toggle: toggleSort } = useSort<"name" | "department" | "position">("name");
+  const { sortBy, sortOpen, select: selectSort, toggle: toggleSort } = useSort<"name" | "department" | "position" | "equipos">("name");
   const [selected, setSelected] = useState<string[]>([]);
   const [form, setForm] = useState<OperatorForm | null>(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -55,9 +55,12 @@ export function OperatorsScreen() {
         .toLowerCase()
         .includes(term),
     )
-    .sort((a, b) =>
-      a[sortBy].localeCompare(b[sortBy], "es", { sensitivity: "base" }),
-    );
+    .sort((a, b) => {
+      if (sortBy === "equipos") {
+        return (activeByOperator.get(a.id) ?? 0) - (activeByOperator.get(b.id) ?? 0);
+      }
+      return a[sortBy].localeCompare(b[sortBy], "es", { sensitivity: "base" });
+    });
 
   function tagsFor(operatorId: number) {
     return [
@@ -146,6 +149,7 @@ export function OperatorsScreen() {
                 { value: "name", label: "Nombre" },
                 { value: "department", label: "Departamento" },
                 { value: "position", label: "Puesto" },
+                { value: "equipos", label: "Equipos activos" },
               ]}
               value={sortBy}
               open={sortOpen}
