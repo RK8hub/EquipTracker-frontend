@@ -12,7 +12,7 @@ export interface FooterProps extends HTMLAttributes<HTMLElement> {
 }
 
 export function Footer({
-  count = 0,
+  count,
   total = 0,
   summary,
   onPrevious,
@@ -23,8 +23,11 @@ export function Footer({
   return (
     <footer className={cn("eq-footer", className)} {...props}>
       <span className="eq-footer__summary">
-        {summary ?? `${count} de ${total} fila(s) seleccionadas.`}
-        {summary ? ` · ${count} seleccionada(s)` : ""}
+        {summary ??
+          (count !== undefined
+            ? `${count} de ${total} fila(s) seleccionadas.`
+            : `${total} fila(s).`)}
+        {summary && count !== undefined ? ` · ${count} seleccionada(s)` : ""}
       </span>
       <div className="eq-footer__actions">
         <NavigationButton direction="previous" onClick={onPrevious} />

@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 export function errorMessage(error: unknown): string {
   return error instanceof Error ? error.message : "Error inesperado";
@@ -66,4 +66,22 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[] = []) {
   }, [...deps, nonce]);
 
   return { data, loading, error, reload };
+}
+
+export function useScrollPreserve() {
+  const distanceRef = useRef(0);
+  const capture = useCallback(() => {
+    const main = document.querySelector("main") as HTMLElement | null;
+    if (main) {
+      distanceRef.current = main.scrollHeight - main.scrollTop - main.clientHeight;
+    }
+  }, []);
+  const restore = useCallback(() => {
+    const main = document.querySelector("main") as HTMLElement | null;
+    if (main) {
+      const target = main.scrollHeight - main.clientHeight - distanceRef.current;
+      main.scrollTop = Math.max(0, target);
+    }
+  }, []);
+  return { capture, restore };
 }

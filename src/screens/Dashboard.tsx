@@ -2,8 +2,8 @@ import { Monitor, Users, Wrench,FileSpreadsheet } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button, DataTable, DropdownButton, Header, InfoCard, type DataTableColumn, type DataTableRow } from "../eq-ui";
 import { api } from "../api/client";
-import { errorMessage, useAsync } from "../hooks";
-import { formatDate, operatorLabel, equipmentLabel } from "../lib/format";
+import { errorMessage, useAsync, useScrollPreserve } from "../hooks";
+import { displayName, equipmentLabel } from "../lib/format";
 import { exportToCsv } from "../lib/csv";
 import { toMap } from "../lib/lookups";
 import { assignmentColumns, assignmentRow } from "../tables/assignments";
@@ -39,9 +39,13 @@ export function DashboardScreen() {
   const [open, setOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [page, setPage] = useState(0);
+  const { capture: captureScroll, restore: restoreScroll } = useScrollPreserve();
   useEffect(() => {
     setPage(0);
   }, [view, search]);
+  useEffect(() => {
+    restoreScroll();
+  }, [page, restoreScroll]);
 
   if (loading && !data) return <Loading />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
@@ -122,12 +126,12 @@ export function DashboardScreen() {
     rows = data.incidents
       .filter((incident) => {
         const equipment = equipmentById.get(incident.equipment_id);
-        const technician = operatorById.get(incident.technician_id);
-        return `${equipment?.brand ?? ""} ${equipment?.model ?? ""} ${incident.type} ${incident.reason} ${technician?.name ?? ""}`
+        const technician = userById.get(incident.technician_id);
+        return `${equipment?.brand ?? ""} ${equipment?.model ?? ""} ${incident.type} ${incident.reason} ${technician ? displayName(technician.email) : ""}`
           .toLowerCase()
           .includes(term);
       })
-      .map((incident) => incidentRow(incident, { equipmentById, operatorById }));
+      .map((incident) => incidentRow(incident, { equipmentById, userById }));
   }
 
   const selectedRows = rows.filter((row) => selectedIds.includes(row.id));
@@ -137,13 +141,23 @@ export function DashboardScreen() {
   const safePage = Math.min(page, totalPages - 1);
   const pageRows = rows.slice(safePage * pageSize, (safePage + 1) * pageSize);
 
+  const handlePrev = () => {
+    captureScroll();
+    setPage((value) => (value - 1 + totalPages) % totalPages);
+  };
+  const handleNext = () => {
+    captureScroll();
+    setPage((value) => (value + 1) % totalPages);
+  };
+
   function exportCsv() {
     if (selectedRows.length === 0) return;
     exportToCsv(selectedRows, columns, `${view}.csv`);
   }
 
   return (
-    <Page
+    <div className="flex min-h-full flex-col">
+      <Page
       title="Dashboard"
       subtitle="Resumen del inventario y las asignaciones registradas."
     >
@@ -169,9 +183,10 @@ export function DashboardScreen() {
         columns={columns}
         rows={pageRows}
         selectable
+        allRowIds={rows.map((row) => row.id)}
         selectedIds={selectedIds}
-        onPrevious={() => setPage((value) => Math.max(value - 1, 0))}
-        onNext={() => setPage((value) => Math.min(value + 1, totalPages - 1))}
+        onPrevious={handlePrev}
+        onNext={handleNext}
         onSelectedChange={setSelectedIds}
         toolbar={
           <Header
@@ -218,8 +233,10 @@ export function DashboardScreen() {
             }
           />
         }
-        summary={`${rows.length} registros`}
+        summary={`${rows.length} registros · pág. ${safePage + 1}/${totalPages}`}
       />
     </Page>
+    <div className="flex-1" />
+  </div>
   );
 }

@@ -1,6 +1,6 @@
 import type { DataTableColumn, DataTableRow } from "../eq-ui";
-import type { Equipment, Incident, Operator } from "../types";
-import { equipmentLabel, formatDate, operatorLabel } from "../lib/format";
+import type { Equipment, Incident, User } from "../types";
+import { equipmentLabel, formatDate, userLabel } from "../lib/format";
 
 export const incidentColumns: DataTableColumn[] = [
   { key: "equipo", header: "Equipo" },
@@ -16,7 +16,7 @@ export function incidentRow(
   incident: Incident,
   lookups: {
     equipmentById: Map<number, Equipment>;
-    operatorById: Map<number, Operator>;
+    userById: Map<number, User>;
   },
 ): DataTableRow {
   const equipment = lookups.equipmentById.get(incident.equipment_id);
@@ -25,8 +25,12 @@ export function incidentRow(
     equipo: equipmentLabel(equipment, incident.equipment_id),
     serial: equipment?.serial ?? "",
     tipo: incident.type,
-    motivo: incident.reason,
-    tecnico: operatorLabel(lookups.operatorById.get(incident.technician_id), incident.technician_id),
+    motivo: (
+      <span className="block w-full truncate" title={incident.reason}>
+        {incident.reason}
+      </span>
+    ),
+    tecnico: userLabel(lookups.userById.get(incident.technician_id), incident.technician_id),
     estado: incident.status === "open" ? "Abierta" : "Cerrada",
     fecha: formatDate(incident.created_at),
   };

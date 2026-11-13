@@ -1,7 +1,15 @@
 @reference "../../tokens/tokens.css";
 
+.eq-select__panel {
+  @apply overflow-hidden rounded-[8px] border border-stroke bg-object text-base text-primary shadow-lg;
+}
+
+.eq-select__search {
+  @apply w-full border-b border-stroke bg-transparent px-3 py-2 text-base text-primary outline-none;
+}
+
 .eq-select__list {
-  @apply max-h-60 overflow-auto rounded-[8px] border border-stroke bg-object py-1 text-base text-primary shadow-lg;
+  @apply max-h-60 overflow-auto py-1;
 }
 
 .eq-select__option {

@@ -1,10 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { Button, DataTable, Header, type DataTableColumn, type DataTableRow } from "../eq-ui";
 import { SortDropdown } from "../components/SortDropdown";
 import { assignmentColumns, assignmentRow } from "../tables/assignments";
 import { api } from "../api/client";
-import { errorMessage, useAsync, useSort } from "../hooks";
+import { errorMessage, useAsync, useScrollPreserve, useSort } from "../hooks";
 import { displayName, equipmentLabel, formatDate, operatorLabel } from "../lib/format";
 import { toMap } from "../lib/lookups";
 import { ErrorState, Loading } from "../components/Feedback";
@@ -45,6 +45,11 @@ export function AssignmentsScreen() {
   const [page, setPage] = useState(0);
   const [form, setForm] = useState<AssignmentForm | null>(null);
   const [busy, setBusy] = useState(false);
+
+  const { capture: captureScroll, restore: restoreScroll } = useScrollPreserve();
+  useEffect(() => {
+    restoreScroll();
+  }, [page, restoreScroll]);
 
   if (loading && !data) return <Loading />;
   if (error) return <ErrorState message={error} onRetry={reload} />;
@@ -116,6 +121,15 @@ export function AssignmentsScreen() {
   const safePage = Math.min(page, totalPages - 1);
   const pageRows = rows.slice(safePage * pageSize, (safePage + 1) * pageSize);
 
+  const handlePrev = () => {
+    captureScroll();
+    setPage((value) => (value - 1 + totalPages) % totalPages);
+  };
+  const handleNext = () => {
+    captureScroll();
+    setPage((value) => (value + 1) % totalPages);
+  };
+
   async function save() {
     if (!form || busy) return;
     const equipmentId = Number(form.equipment_id);
@@ -160,19 +174,23 @@ export function AssignmentsScreen() {
     }
   }
 
-  const operatorOptions = data.operators.map((operator) => ({
-    value: String(operator.id),
-    label: operator.name,
-  }));
+  const operatorOptions = data.operators
+    .slice()
+    .sort((a, b) => a.name.localeCompare(b.name, "es", { sensitivity: "base" }))
+    .map((operator) => ({
+      value: String(operator.id),
+      label: operator.name,
+    }));
 
   return (
-    <Page title="Asignaciones" subtitle="Equipos entregados y su historial de devolución.">
+    <div className="flex min-h-full flex-col">
+      <Page title="Asignaciones" subtitle="Equipos entregados y su historial de devolución.">
       <DataTable
         columns={columns}
         rows={pageRows}
         selectable={false}
-        onPrevious={() => setPage((value) => Math.max(value - 1, 0))}
-        onNext={() => setPage((value) => Math.min(value + 1, totalPages - 1))}
+        onPrevious={handlePrev}
+        onNext={handleNext}
         toolbar={
           <Header
             variant="crud"
@@ -225,6 +243,7 @@ export function AssignmentsScreen() {
         >
           <SelectField
             label="Equipo"
+            searchable
             value={form.equipment_id}
             onChange={(value) =>
               setForm((current) => (current ? { ...current, equipment_id: value } : current))
@@ -243,6 +262,7 @@ export function AssignmentsScreen() {
           />
           <SelectField
             label="Operador"
+            searchable
             value={form.operator_id}
             onChange={(value) =>
               setForm((current) => (current ? { ...current, operator_id: value } : current))
@@ -252,6 +272,7 @@ export function AssignmentsScreen() {
           />
           <SelectField
             label="Asignador"
+            searchable
             value={form.assigned_by}
             onChange={(value) =>
               setForm((current) => (current ? { ...current, assigned_by: value } : current))
@@ -269,5 +290,7 @@ export function AssignmentsScreen() {
         </ModalCard>
       )}
     </Page>
+    <div className="flex-1" />
+  </div>
   );
 }

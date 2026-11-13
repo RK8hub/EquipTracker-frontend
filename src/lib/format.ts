@@ -31,6 +31,13 @@ export function operatorLabel(
   return operator?.name ?? `Operador #${id}`;
 }
 
+export function userLabel(
+  user: { email: string } | undefined,
+  id: number,
+): string {
+  return user ? displayName(user.email) : `Usuario #${id}`;
+}
+
 export function displayName(email: string): string {
   return (
     (email.split("@")[0] || "")

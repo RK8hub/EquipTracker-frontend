@@ -29,6 +29,8 @@ export interface DataTableProps
   summary?: string;
   toolbar?: ReactNode;
   selectable?: boolean;
+  /** Ids de todas las filas (incluidas otras páginas) para "seleccionar todo". */
+  allRowIds?: string[];
   showToolbar?: boolean;
 }
 
@@ -44,12 +46,15 @@ export function DataTable({
   summary,
   toolbar,
   selectable = true,
+  allRowIds,
   showToolbar = true,
   className,
   ...props
 }: DataTableProps) {
+  const selectableRowIds = allRowIds ?? rows.map((row) => row.id);
   const allSelected =
-    rows.length > 0 && rows.every((row) => selectedIds.includes(row.id));
+    selectableRowIds.length > 0 &&
+    selectableRowIds.every((id) => selectedIds.includes(id));
 
   const toggle = (id: string) => {
     onSelectedChange?.(
@@ -80,7 +85,7 @@ export function DataTable({
                   label="Seleccionar todo"
                   checked={allSelected}
                   onCheckedChange={() =>
-                    onSelectedChange?.(allSelected ? [] : rows.map((row) => row.id))
+                    onSelectedChange?.(allSelected ? [] : selectableRowIds)
                   }
                 />
               </div>
@@ -122,7 +127,11 @@ export function DataTable({
                     title={title}
                     className={cn("eq-data-table__cell", column.className)}
                   >
-                    {value}
+                    {typeof value === "string" ? (
+                      <span className="block w-full truncate">{value}</span>
+                    ) : (
+                      value
+                    )}
                   </div>
                 );
               })}
@@ -136,7 +145,7 @@ export function DataTable({
       </div>
 
       <Footer
-        count={selectedIds.length}
+        count={selectable ? selectedIds.length : undefined}
         total={rows.length}
         summary={summary}
         onPrevious={onPrevious}
