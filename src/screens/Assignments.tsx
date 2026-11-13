@@ -71,7 +71,8 @@ export function AssignmentsScreen() {
       const equipment = equipmentById.get(assignment.equipment_id);
       const operator = operatorById.get(assignment.operator_id);
       const assigner = userById.get(assignment.assigned_by);
-      return `${equipment?.brand ?? ""} ${equipment?.model ?? ""} ${equipment?.serial ?? ""} ${operator?.name ?? ""} ${assigner?.email ?? ""}`
+      const assignerText = sortBy === "asignador" ? (assigner?.email ?? "") : "";
+      return `${equipment?.brand ?? ""} ${equipment?.model ?? ""} ${equipment?.serial ?? ""} ${operator?.name ?? ""} ${assignerText} ${assignment.status} ${assignment.assigned_at}`
         .toLowerCase()
         .includes(term);
     })
