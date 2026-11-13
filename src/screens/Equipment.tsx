@@ -127,8 +127,11 @@ export function EquipmentScreen() {
               : sortBy === "incidencias"
                 ? (openIncidentsByEquipment.get(b.id) ?? 0)
                 : isAssigned(b.id);
-      if (sortBy === "estado" || sortBy === "incidencias") {
+      if (sortBy === "estado") {
         return (av as number) - (bv as number);
+      }
+      if (sortBy === "incidencias") {
+        return (bv as number) - (av as number);
       }
       return String(av).localeCompare(String(bv), "es", { sensitivity: "base" });
     });
