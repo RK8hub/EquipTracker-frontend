@@ -48,14 +48,6 @@ export function OperatorsScreen() {
     );
   }
 
-  const incidentsByOperator = new Map<number, number>();
-  for (const incident of data.incidents) {
-    if (incident.status !== "open") continue;
-    for (const id of [incident.reported_by, incident.technician_id]) {
-      incidentsByOperator.set(id, (incidentsByOperator.get(id) ?? 0) + 1);
-    }
-  }
-
   const term = search.trim().toLowerCase();
   const filtered = data.operators
     .filter((operator) =>
@@ -70,7 +62,6 @@ export function OperatorsScreen() {
   function tagsFor(operatorId: number) {
     return [
       { label: "Equipos Activos", quantity: activeByOperator.get(operatorId) ?? 0 },
-      { label: "Incidencias", quantity: incidentsByOperator.get(operatorId) ?? 0 },
     ];
   }
 
